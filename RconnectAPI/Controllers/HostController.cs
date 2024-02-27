@@ -19,7 +19,7 @@ public class HostController : Controller
     [HttpGet]
     public async Task<List<Host>> Get(int limit = 10, int page = 1)
     {
-        return await _hostService.GetAsync();
+        return await _hostService.GetAsync(limit, page);
     }
     [HttpGet("{id:length(24)}")]
     public async Task<ActionResult<Host>> Get(string id)
