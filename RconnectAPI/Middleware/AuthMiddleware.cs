@@ -20,21 +20,16 @@ public class AuthMiddleware
     {
         if (!context.Request.Path.StartsWithSegments("/api"))
         {
-            Console.WriteLine("skip");
             await _next(context);
             return;
         }
-        Console.WriteLine(context.Request.Path);
         var tokenHandler = new JwtSecurityTokenHandler();
         string? authHeader = context.Request.Headers.Authorization;
         if (authHeader != null)
         {
             if (tokenHandler.CanReadToken(authHeader))
             {
-                Console.WriteLine("token");
-                Console.WriteLine(authHeader);
                 var decodedToken = tokenHandler.ReadJwtToken(authHeader);
-                Console.WriteLine(decodedToken);
                 string userId = decodedToken.Claims.First(claim => claim.Type == "nameid").Value;
 
                 var user = await _userService.GetAsync(userId);
@@ -48,7 +43,6 @@ public class AuthMiddleware
             }
             else
             {
-                Console.WriteLine("token invalide");
                 throw new Exception("Invalid token");
             }
             
