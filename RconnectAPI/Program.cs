@@ -1,3 +1,4 @@
+using RconnectAPI.Middleware;
 using RconnectAPI.Models;
 using RconnectAPI.Services;
 
@@ -33,6 +34,7 @@ if (app.Environment.IsDevelopment())
     app.UseCors("DEV");
 }
 
+app.UseMiddleware<AuthMiddleware>();
 app.UseHttpsRedirection();
 
 app.MapControllers();
