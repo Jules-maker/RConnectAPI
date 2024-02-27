@@ -29,5 +29,6 @@ namespace RconnectAPI.Models
         public string Mainphoto { get; set; }
         public Boolean Isverified { get; set; }
         public List<string> Openinghours { get; set; } = new List<string>();
+        public DateTime Createdat { get; set; }
     }
 }
