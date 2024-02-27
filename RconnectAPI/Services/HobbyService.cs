@@ -1,3 +1,5 @@
+using System.Linq.Expressions;
+using System.Runtime.InteropServices.JavaScript;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using RconnectAPI.Models;
@@ -14,8 +16,11 @@ public class HobbyService
         _hobbyCollection = database.GetCollection<Hobby>("hobbies");
     }
 
-    public async Task<List<Hobby>> GetAsync(int limit = 10, int page = 1) =>
+    public async Task<List<Hobby>> GetAsync(int limit = 10, int page = 1) => 
         await _hobbyCollection.Find(_ => true).SortBy(i => i.Name).Skip((page - 1) * limit).Limit(limit).ToListAsync();
+
+    public async Task<long> GetCountAsync() =>
+        await _hobbyCollection.CountDocumentsAsync(_ => true);
 
     public async Task<Hobby?> GetAsync(string id) =>
         await _hobbyCollection.Find(x => x.Id == id).FirstOrDefaultAsync();

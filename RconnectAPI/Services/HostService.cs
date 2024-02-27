@@ -17,6 +17,9 @@ public class HostService
 
     public async Task<List<Host>> GetAsync(int limit = 10, int page = 1) =>
         await _hostCollection.Find(_ => true).Skip((page - 1) * limit).Limit(limit).ToListAsync();
+    
+    public async Task<long> GetCountAsync() =>
+        await _hostCollection.CountDocumentsAsync(_ => true);
 
     public async Task<Host?> GetAsync(string id) =>
         await _hostCollection.Find(x => x.Id == id).FirstOrDefaultAsync();

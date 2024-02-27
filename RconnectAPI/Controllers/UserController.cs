@@ -15,9 +15,11 @@ public class UserController: Controller {
     }
 
     [HttpGet]
-    public async Task<List<User>> Get(int limit = 10, int page = 1)
+    public async Task<ResponseData<User>> Get(int limit = 10, int page = 1)
     {
-        return await _userService.GetAsync(limit, page);
+        var data = await _userService.GetAsync(limit, page);
+        var count = await _userService.GetCountAsync();
+        return new ResponseData<User>(data, count);
     }
     [HttpGet("{id:length(24)}")]
     public async Task<ActionResult<User>> Get(string id)

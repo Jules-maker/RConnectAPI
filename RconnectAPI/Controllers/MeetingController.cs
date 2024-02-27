@@ -16,9 +16,11 @@ public class MeetingController : Controller
     }
 
     [HttpGet]
-    public async Task<List<Meeting>> Get(int limit = 10, int page = 1)
+    public async Task<ResponseData<Meeting>> Get(int limit = 10, int page = 1)
     {
-        return await _meetingService.GetAsync(limit, page);
+        var data = await _meetingService.GetAsync(limit, page);
+        var count = await _meetingService.GetCountAsync();
+        return new ResponseData<Meeting>(data, count);
     }
     [HttpGet("{id:length(24)}")]
     public async Task<ActionResult<Meeting>> Get(string id)
