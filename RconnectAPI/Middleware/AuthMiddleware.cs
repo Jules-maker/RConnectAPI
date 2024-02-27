@@ -1,7 +1,5 @@
 using System.IdentityModel.Tokens.Jwt;
 using RconnectAPI.Services;
-using Microsoft.AspNetCore.Mvc;
-using RconnectAPI.Models;
 
 namespace RconnectAPI.Middleware;
 

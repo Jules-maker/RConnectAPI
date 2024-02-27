@@ -17,10 +17,10 @@ public class HostController : Controller
     }
 
     [HttpGet]
-    public async Task<ResponseData<Host>> Get(int limit = 10, int page = 1)
+    public async Task<ResponseData<Host>> Get(int limit = 10, int page = 1, string searchValue = "")
     {
-        var data = await _hostService.GetAsync(limit, page);
-        var count = await _hostService.GetCountAsync();
+        var data = await _hostService.GetAsync(limit, page, searchValue);
+        var count = await _hostService.GetCountAsync(searchValue);
         return new ResponseData<Host>(data, count);
     }
     [HttpGet("{id:length(24)}")]
@@ -50,7 +50,7 @@ public class HostController : Controller
 
             return CreatedAtAction(nameof(Get), newHost);
         }
-        catch (Exception ex)
+        catch
         {
             // Log the exception
             return StatusCode(500, "An error occurred while creating the host.");

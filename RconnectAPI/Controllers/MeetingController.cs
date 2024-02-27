@@ -49,7 +49,7 @@ public class MeetingController : Controller
 
             return CreatedAtAction(nameof(Get), newMeeting);
         }
-        catch (Exception ex)
+        catch
         {
             // Log the exception
             return StatusCode(500, "An error occurred while creating the meeting.");

@@ -15,11 +15,22 @@ public class HostService
         _hostCollection = database.GetCollection<Host>("hosts");
     }
 
-    public async Task<List<Host>> GetAsync(int limit = 10, int page = 1) =>
-        await _hostCollection.Find(_ => true).Skip((page - 1) * limit).Limit(limit).ToListAsync();
-    
-    public async Task<long> GetCountAsync() =>
-        await _hostCollection.CountDocumentsAsync(_ => true);
+    public async Task<List<Host>> GetAsync(int limit = 10, int page = 1, string searchValue = "")
+    {
+        return await _hostCollection.Find(h => h.Name.Contains(searchValue, StringComparison.CurrentCultureIgnoreCase)).Skip((page - 1) * limit).Limit(limit).ToListAsync();
+    }
+
+    public async Task<long> GetCountAsync(string? searchValue = null)
+    {
+        if (searchValue != null)
+        {
+            var countMdb = await _hostCollection
+                .CountDocumentsAsync(h => h.Name.Contains(searchValue, StringComparison.CurrentCultureIgnoreCase));
+            return countMdb;
+        }
+        return await _hostCollection.CountDocumentsAsync(_ => true);
+    }
+        
 
     public async Task<Host?> GetAsync(string id) =>
         await _hostCollection.Find(x => x.Id == id).FirstOrDefaultAsync();

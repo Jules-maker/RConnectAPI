@@ -48,7 +48,7 @@ public class HobbyController: Controller {
 
             return CreatedAtAction(nameof(Get), newHobby);
         }
-        catch (Exception ex)
+        catch
         {
             // Log the exception
             return StatusCode(500, "An error occurred while creating the hobby.");
