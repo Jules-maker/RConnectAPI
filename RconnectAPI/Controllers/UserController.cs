@@ -33,26 +33,26 @@ public class UserController: Controller {
     }
 
     [HttpPost]
-    public async Task<IActionResult> Post(User newBook)
+    public async Task<IActionResult> Post(User newUser)
     {
-        await _userService.CreateAsync(newBook);
+        await _userService.CreateAsync(newUser);
 
-        return CreatedAtAction(nameof(Get), new { id = newBook.Id }, newBook);
+        return CreatedAtAction(nameof(Get), new { id = newUser.Id }, newUser);
     }
 
     [HttpPut("{id:length(24)}")]
-    public async Task<IActionResult> Update(string id, User updatedBook)
+    public async Task<IActionResult> Update(string id, User updatedUser)
     {
-        var book = await _userService.GetAsync(id);
+        var user = await _userService.GetAsync(id);
 
-        if (book is null)
+        if (user is null)
         {
             return NotFound();
         }
 
-        updatedBook.Id = book.Id;
+        updatedUser.Id = user.Id;
 
-        await _userService.UpdateAsync(id, updatedBook);
+        await _userService.UpdateAsync(id, updatedUser);
 
         return NoContent();
     }
@@ -60,9 +60,9 @@ public class UserController: Controller {
     [HttpDelete("{id:length(24)}")]
     public async Task<IActionResult> Delete(string id)
     {
-        var book = await _userService.GetAsync(id);
+        var user = await _userService.GetAsync(id);
 
-        if (book is null)
+        if (user is null)
         {
             return NotFound();
         }
