@@ -15,9 +15,9 @@ public class HobbyController: Controller {
     }
 
     [HttpGet]
-    public async Task<List<Hobby>> Get()
+    public async Task<List<Hobby>> Get(int limit = 10, int page = 1)
     {
-        return await _hobbyService.GetAsync();
+        return await _hobbyService.GetAsync(limit, page);
     }
     [HttpGet("{id:length(24)}")]
     public async Task<ActionResult<Hobby>> Get(string id)

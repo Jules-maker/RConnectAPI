@@ -15,8 +15,8 @@ public class HostService
         _hostCollection = database.GetCollection<Host>("hosts");
     }
 
-    public async Task<List<Host>> GetAsync() =>
-        await _hostCollection.Find(_ => true).ToListAsync();
+    public async Task<List<Host>> GetAsync(int limit = 10, int page = 1) =>
+        await _hostCollection.Find(_ => true).Skip((page - 1) * limit).Limit(limit).ToListAsync();
 
     public async Task<Host?> GetAsync(string id) =>
         await _hostCollection.Find(x => x.Id == id).FirstOrDefaultAsync();

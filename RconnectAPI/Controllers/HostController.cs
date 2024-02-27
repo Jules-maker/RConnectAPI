@@ -17,7 +17,7 @@ public class HostController : Controller
     }
 
     [HttpGet]
-    public async Task<List<Host>> Get()
+    public async Task<List<Host>> Get(int limit = 10, int page = 1)
     {
         return await _hostService.GetAsync();
     }

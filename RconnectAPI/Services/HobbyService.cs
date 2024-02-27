@@ -14,8 +14,8 @@ public class HobbyService
         _hobbyCollection = database.GetCollection<Hobby>("hobbies");
     }
 
-    public async Task<List<Hobby>> GetAsync() =>
-        await _hobbyCollection.Find(_ => true).ToListAsync();
+    public async Task<List<Hobby>> GetAsync(int limit = 10, int page = 1) =>
+        await _hobbyCollection.Find(_ => true).SortBy(i => i.Name).Skip((page - 1) * limit).Limit(limit).ToListAsync();
 
     public async Task<Hobby?> GetAsync(string id) =>
         await _hobbyCollection.Find(x => x.Id == id).FirstOrDefaultAsync();

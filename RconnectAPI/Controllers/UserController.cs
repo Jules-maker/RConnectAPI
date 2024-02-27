@@ -15,7 +15,7 @@ public class UserController: Controller {
     }
 
     [HttpGet]
-    public async Task<List<User>> Get()
+    public async Task<List<User>> Get(int limit = 10, int page = 1)
     {
         return await _userService.GetAsync();
     }
