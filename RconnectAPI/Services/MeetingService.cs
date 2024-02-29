@@ -15,8 +15,11 @@ public class MeetingService
         _meetingCollection = database.GetCollection<Meeting>("meetings");
     }
 
-    public async Task<List<Meeting>> GetAsync() =>
-        await _meetingCollection.Find(_ => true).ToListAsync();
+    public async Task<List<Meeting>> GetAsync(int limit = 10, int page = 1) =>
+        await _meetingCollection.Find(_ => true).Skip((page - 1) * limit).Limit(limit).ToListAsync();
+    
+    public async Task<long> GetCountAsync() =>
+        await _meetingCollection.CountDocumentsAsync(_ => true);
 
     public async Task<Meeting?> GetAsync(string id) =>
         await _meetingCollection.Find(x => x.Id == id).FirstOrDefaultAsync();

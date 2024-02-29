@@ -16,21 +16,23 @@ public class MeetingController : Controller
     }
 
     [HttpGet]
-    public async Task<List<Meeting>> Get()
+    public async Task<ResponseData<Meeting>> Get(int limit = 10, int page = 1)
     {
-        return await _meetingService.GetAsync();
+        var data = await _meetingService.GetAsync(limit, page);
+        var count = await _meetingService.GetCountAsync();
+        return new ResponseData<Meeting>(data, count);
     }
     [HttpGet("{id:length(24)}")]
     public async Task<ActionResult<Meeting>> Get(string id)
     {
-        var user = await _meetingService.GetAsync(id);
+        var meeting = await _meetingService.GetAsync(id);
 
-        if (user is null)
+        if (meeting is null)
         {
             return NotFound();
         }
 
-        return user;
+        return meeting;
     }
 
     [HttpPost]
@@ -56,18 +58,18 @@ public class MeetingController : Controller
 
 
     [HttpPut("{id:length(24)}")]
-    public async Task<IActionResult> Update(string id, Meeting updatedBook)
+    public async Task<IActionResult> Update(string id, Meeting updatedMeeting)
     {
-        var book = await _meetingService.GetAsync(id);
+        var meeting = await _meetingService.GetAsync(id);
 
-        if (book is null)
+        if (meeting is null)
         {
             return NotFound();
         }
 
-        updatedBook.Id = book.Id;
+        updatedMeeting.Id = meeting.Id;
 
-        await _meetingService.UpdateAsync(id, updatedBook);
+        await _meetingService.UpdateAsync(id, updatedMeeting);
 
         return NoContent();
     }
@@ -75,9 +77,9 @@ public class MeetingController : Controller
     [HttpDelete("{id:length(24)}")]
     public async Task<IActionResult> Delete(string id)
     {
-        var book = await _meetingService.GetAsync(id);
+        var meeting = await _meetingService.GetAsync(id);
 
-        if (book is null)
+        if (meeting is null)
         {
             return NotFound();
         }

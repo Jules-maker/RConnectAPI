@@ -15,21 +15,23 @@ public class HobbyController: Controller {
     }
 
     [HttpGet]
-    public async Task<List<Hobby>> Get()
+    public async Task<ResponseData<Hobby>> Get(int limit = 10, int page = 1)
     {
-        return await _hobbyService.GetAsync();
+        var data = await _hobbyService.GetAsync(limit, page);
+        var count = await _hobbyService.GetCountAsync();
+        return new ResponseData<Hobby>(data, count);
     }
     [HttpGet("{id:length(24)}")]
     public async Task<ActionResult<Hobby>> Get(string id)
     {
-        var user = await _hobbyService.GetAsync(id);
+        var hobby = await _hobbyService.GetAsync(id);
 
-        if (user is null)
+        if (hobby is null)
         {
             return NotFound();
         }
 
-        return user;
+        return hobby;
     }
 
     [HttpPost]
@@ -55,18 +57,18 @@ public class HobbyController: Controller {
 
 
     [HttpPut("{id:length(24)}")]
-    public async Task<IActionResult> Update(string id, Hobby updatedBook)
+    public async Task<IActionResult> Update(string id, Hobby updatedHobby)
     {
-        var book = await _hobbyService.GetAsync(id);
+        var hobby = await _hobbyService.GetAsync(id);
 
-        if (book is null)
+        if (hobby is null)
         {
             return NotFound();
         }
 
-        updatedBook.Id = book.Id;
+        updatedHobby.Id = hobby.Id;
 
-        await _hobbyService.UpdateAsync(id, updatedBook);
+        await _hobbyService.UpdateAsync(id, updatedHobby);
 
         return NoContent();
     }
@@ -74,9 +76,9 @@ public class HobbyController: Controller {
     [HttpDelete("{id:length(24)}")]
     public async Task<IActionResult> Delete(string id)
     {
-        var book = await _hobbyService.GetAsync(id);
+        var hobby = await _hobbyService.GetAsync(id);
 
-        if (book is null)
+        if (hobby is null)
         {
             return NotFound();
         }

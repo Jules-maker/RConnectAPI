@@ -15,9 +15,11 @@ public class UserController: Controller {
     }
 
     [HttpGet]
-    public async Task<List<User>> Get()
+    public async Task<ResponseData<User>> Get(int limit = 10, int page = 1)
     {
-        return await _userService.GetAsync();
+        var data = await _userService.GetAsync(limit, page);
+        var count = await _userService.GetCountAsync();
+        return new ResponseData<User>(data, count);
     }
     [HttpGet("{id:length(24)}")]
     public async Task<ActionResult<User>> Get(string id)
@@ -33,26 +35,26 @@ public class UserController: Controller {
     }
 
     [HttpPost]
-    public async Task<IActionResult> Post(User newBook)
+    public async Task<IActionResult> Post(User newUser)
     {
-        await _userService.CreateAsync(newBook);
+        await _userService.CreateAsync(newUser);
 
-        return CreatedAtAction(nameof(Get), new { id = newBook.Id }, newBook);
+        return CreatedAtAction(nameof(Get), new { id = newUser.Id }, newUser);
     }
 
     [HttpPut("{id:length(24)}")]
-    public async Task<IActionResult> Update(string id, User updatedBook)
+    public async Task<IActionResult> Update(string id, User updatedUser)
     {
-        var book = await _userService.GetAsync(id);
+        var user = await _userService.GetAsync(id);
 
-        if (book is null)
+        if (user is null)
         {
             return NotFound();
         }
 
-        updatedBook.Id = book.Id;
+        updatedUser.Id = user.Id;
 
-        await _userService.UpdateAsync(id, updatedBook);
+        await _userService.UpdateAsync(id, updatedUser);
 
         return NoContent();
     }
@@ -60,9 +62,9 @@ public class UserController: Controller {
     [HttpDelete("{id:length(24)}")]
     public async Task<IActionResult> Delete(string id)
     {
-        var book = await _userService.GetAsync(id);
+        var user = await _userService.GetAsync(id);
 
-        if (book is null)
+        if (user is null)
         {
             return NotFound();
         }
@@ -70,33 +72,5 @@ public class UserController: Controller {
         await _userService.RemoveAsync(id);
 
         return NoContent();
-    }
-    
-    // AUTH ----
-    
-    [HttpPost("login")]
-    public async Task<IActionResult> Connexion([FromBody]UserLoginData loginData)
-    {
-        var user = await _userService.Login(loginData.Email, loginData.Password);
-        if (user == null)
-        {
-            return Unauthorized("Identifiants incorrects.");
-        }
-        Console.WriteLine("user");
-        Console.WriteLine(user.Username);
-
-        var token = _userService.GenerateJwt(user);
-        return Ok(new { token });   
-    }
-    
-    [HttpPost("register")]
-    public async Task<IActionResult> Inscription([FromBody] UserRegisterData newUser)
-    {
-        var user = await _userService.RegisterAsync(newUser.Username, newUser.Email, newUser.Password, newUser.Birthdate, newUser.Firstname, newUser.Lastname);
-        if (user == null)
-        {
-            return BadRequest();
-        }
-        return Ok(user);
     }
 }

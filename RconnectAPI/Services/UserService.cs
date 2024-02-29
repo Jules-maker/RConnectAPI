@@ -28,8 +28,11 @@ public class UserService
         _configuration = configuration;
     }
     
-    public async Task<List<User>> GetAsync() =>
-        await _userCollection.Find(_ => true).ToListAsync();
+    public async Task<List<User>> GetAsync(int limit = 10, int page = 1) =>
+        await _userCollection.Find(_ => true).Skip((page - 1) * limit).Limit(limit).ToListAsync();
+    
+    public async Task<long> GetCountAsync() =>
+        await _userCollection.CountDocumentsAsync(_ => true);
 
     public async Task<User?> GetAsync(string id) =>
         await _userCollection.Find(x => x.Id == id).FirstOrDefaultAsync();

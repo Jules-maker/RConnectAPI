@@ -17,21 +17,23 @@ public class HostController : Controller
     }
 
     [HttpGet]
-    public async Task<List<Host>> Get()
+    public async Task<ResponseData<Host>> Get(int limit = 10, int page = 1)
     {
-        return await _hostService.GetAsync();
+        var data = await _hostService.GetAsync(limit, page);
+        var count = await _hostService.GetCountAsync();
+        return new ResponseData<Host>(data, count);
     }
     [HttpGet("{id:length(24)}")]
     public async Task<ActionResult<Host>> Get(string id)
     {
-        var user = await _hostService.GetAsync(id);
+        var host = await _hostService.GetAsync(id);
 
-        if (user is null)
+        if (host is null)
         {
             return NotFound();
         }
 
-        return user;
+        return host;
     }
 
     [HttpPost]
@@ -57,18 +59,18 @@ public class HostController : Controller
 
 
     [HttpPut("{id:length(24)}")]
-    public async Task<IActionResult> Update(string id, Host updatedBook)
+    public async Task<IActionResult> Update(string id, Host updatedHost)
     {
-        var book = await _hostService.GetAsync(id);
+        var host = await _hostService.GetAsync(id);
 
-        if (book is null)
+        if (host is null)
         {
             return NotFound();
         }
 
-        updatedBook.Id = book.Id;
+        updatedHost.Id = host.Id;
 
-        await _hostService.UpdateAsync(id, updatedBook);
+        await _hostService.UpdateAsync(id, updatedHost);
 
         return NoContent();
     }
@@ -76,9 +78,9 @@ public class HostController : Controller
     [HttpDelete("{id:length(24)}")]
     public async Task<IActionResult> Delete(string id)
     {
-        var book = await _hostService.GetAsync(id);
+        var host = await _hostService.GetAsync(id);
 
-        if (book is null)
+        if (host is null)
         {
             return NotFound();
         }

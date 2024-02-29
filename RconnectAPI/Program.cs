@@ -1,3 +1,4 @@
+using RconnectAPI.Middleware;
 using RconnectAPI.Models;
 using RconnectAPI.Services;
 using DotNetEnv;
@@ -22,6 +23,12 @@ builder.Services.AddSingleton<HostService>();
 builder.Services.AddSingleton<MeetingService>();
 
 builder.Services.AddControllers();
+builder.Services.AddCors(o => o.AddPolicy("DEV", builder =>
+{
+    builder.AllowAnyOrigin()
+        .AllowAnyMethod()
+        .AllowAnyHeader();
+}));
 
 var app = builder.Build();
 
@@ -30,8 +37,10 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    app.UseCors("DEV");
 }
 
+app.UseMiddleware<AuthMiddleware>();
 app.UseHttpsRedirection();
 
 app.MapControllers();
