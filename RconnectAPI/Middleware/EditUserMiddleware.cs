@@ -21,7 +21,9 @@ public class EditUserMiddleware
             await _next(context); 
             return;
         }
-        if (context.Request.Method != "PUT" || !context.Request.Path.StartsWithSegments("/api/User"))
+
+        string[] methods = ["PUT", "DELETE"];
+        if (!methods.Contains(context.Request.Method) || !context.Request.Path.StartsWithSegments("/api/User"))
         {
             await _next(context); 
             return;
