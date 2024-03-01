@@ -30,8 +30,8 @@ public class HobbyService
     }
 
     public HobbyService(IOptions<MongoDbSettings> mongoDBSettings) {
-        MongoClient client = new MongoClient(mongoDBSettings.Value.ConnectionUri);
-        IMongoDatabase database = client.GetDatabase(mongoDBSettings.Value.DatabaseName);
+        MongoClient client = new MongoClient(Environment.GetEnvironmentVariable("MONGODB_CONNECTION_URI"));
+        IMongoDatabase database = client.GetDatabase(Environment.GetEnvironmentVariable("MONGODB_DATABASE_NAME"));
         _hobbyCollection = database.GetCollection<Hobby>("hobbies");
     }
 
