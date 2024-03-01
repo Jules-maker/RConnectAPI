@@ -57,7 +57,7 @@ public class HobbyController: Controller {
 
 
     [HttpPut("{id:length(24)}")]
-    public async Task<IActionResult> Update(string id, Hobby updatedHobby)
+    public async Task<IActionResult> Update(string id, [FromBody] Hobby updatedHobby)
     {
         var hobby = await _hobbyService.GetAsync(id, "");
 
