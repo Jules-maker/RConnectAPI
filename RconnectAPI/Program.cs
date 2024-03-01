@@ -41,6 +41,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseMiddleware<AuthMiddleware>();
+app.UseMiddleware<EditUserMiddleware>();
 app.UseHttpsRedirection();
 
 app.MapControllers();
