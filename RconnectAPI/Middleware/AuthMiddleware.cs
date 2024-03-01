@@ -1,7 +1,5 @@
 using System.IdentityModel.Tokens.Jwt;
 using RconnectAPI.Services;
-using Microsoft.AspNetCore.Mvc;
-using RconnectAPI.Models;
 
 namespace RconnectAPI.Middleware;
 
@@ -32,7 +30,7 @@ public class AuthMiddleware
                 var decodedToken = tokenHandler.ReadJwtToken(authHeader);
                 string userId = decodedToken.Claims.First(claim => claim.Type == "nameid").Value;
 
-                var user = await _userService.GetAsync(userId);
+                var user = await _userService.GetAsync(userId, "_id");
 
                 if (user is null)
                 {

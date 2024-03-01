@@ -17,16 +17,16 @@ public class HostController : Controller
     }
 
     [HttpGet]
-    public async Task<ResponseData<Host>> Get(int limit = 10, int page = 1)
+    public async Task<ResponseData<Host>> Get(string fields = "", int limit = 10, int page = 1, string searchValue = "")
     {
-        var data = await _hostService.GetAsync(limit, page);
-        var count = await _hostService.GetCountAsync();
+        var data = await _hostService.GetAsync(fields, limit, page, searchValue);
+        var count = await _hostService.GetCountAsync(searchValue);
         return new ResponseData<Host>(data, count);
     }
     [HttpGet("{id:length(24)}")]
-    public async Task<ActionResult<Host>> Get(string id)
+    public async Task<ActionResult<Host>> Get(string id, string fields = "")
     {
-        var host = await _hostService.GetAsync(id);
+        var host = await _hostService.GetAsync(id, fields);
 
         if (host is null)
         {
@@ -50,7 +50,7 @@ public class HostController : Controller
 
             return CreatedAtAction(nameof(Get), newHost);
         }
-        catch (Exception ex)
+        catch
         {
             // Log the exception
             return StatusCode(500, "An error occurred while creating the host.");
@@ -61,7 +61,7 @@ public class HostController : Controller
     [HttpPut("{id:length(24)}")]
     public async Task<IActionResult> Update(string id, Host updatedHost)
     {
-        var host = await _hostService.GetAsync(id);
+        var host = await _hostService.GetAsync(id, "");
 
         if (host is null)
         {
@@ -78,7 +78,7 @@ public class HostController : Controller
     [HttpDelete("{id:length(24)}")]
     public async Task<IActionResult> Delete(string id)
     {
-        var host = await _hostService.GetAsync(id);
+        var host = await _hostService.GetAsync(id, "");
 
         if (host is null)
         {

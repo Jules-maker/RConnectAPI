@@ -16,16 +16,16 @@ public class MeetingController : Controller
     }
 
     [HttpGet]
-    public async Task<ResponseData<Meeting>> Get(int limit = 10, int page = 1)
+    public async Task<ResponseData<Meeting>> Get(string fields = "", int limit = 10, int page = 1)
     {
-        var data = await _meetingService.GetAsync(limit, page);
+        var data = await _meetingService.GetAsync(fields, limit, page);
         var count = await _meetingService.GetCountAsync();
         return new ResponseData<Meeting>(data, count);
     }
     [HttpGet("{id:length(24)}")]
-    public async Task<ActionResult<Meeting>> Get(string id)
+    public async Task<ActionResult<Meeting>> Get(string id, string fields = "")
     {
-        var meeting = await _meetingService.GetAsync(id);
+        var meeting = await _meetingService.GetAsync(id, fields);
 
         if (meeting is null)
         {
@@ -49,7 +49,7 @@ public class MeetingController : Controller
 
             return CreatedAtAction(nameof(Get), newMeeting);
         }
-        catch (Exception ex)
+        catch
         {
             // Log the exception
             return StatusCode(500, "An error occurred while creating the meeting.");
@@ -60,7 +60,7 @@ public class MeetingController : Controller
     [HttpPut("{id:length(24)}")]
     public async Task<IActionResult> Update(string id, Meeting updatedMeeting)
     {
-        var meeting = await _meetingService.GetAsync(id);
+        var meeting = await _meetingService.GetAsync(id, "");
 
         if (meeting is null)
         {
@@ -77,7 +77,7 @@ public class MeetingController : Controller
     [HttpDelete("{id:length(24)}")]
     public async Task<IActionResult> Delete(string id)
     {
-        var meeting = await _meetingService.GetAsync(id);
+        var meeting = await _meetingService.GetAsync(id, "");
 
         if (meeting is null)
         {

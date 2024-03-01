@@ -15,16 +15,16 @@ public class UserController: Controller {
     }
 
     [HttpGet]
-    public async Task<ResponseData<User>> Get(int limit = 10, int page = 1)
+    public async Task<ResponseData<User>> Get(string fields = "", int limit = 10, int page = 1)
     {
-        var data = await _userService.GetAsync(limit, page);
+        var data = await _userService.GetAsync(fields, limit, page);
         var count = await _userService.GetCountAsync();
         return new ResponseData<User>(data, count);
     }
     [HttpGet("{id:length(24)}")]
-    public async Task<ActionResult<User>> Get(string id)
+    public async Task<ActionResult<User>> Get(string id, string fields = "")
     {
-        var user = await _userService.GetAsync(id);
+        var user = await _userService.GetAsync(id, fields);
 
         if (user is null)
         {
@@ -45,7 +45,7 @@ public class UserController: Controller {
     [HttpPut("{id:length(24)}")]
     public async Task<IActionResult> Update(string id, User updatedUser)
     {
-        var user = await _userService.GetAsync(id);
+        var user = await _userService.GetAsync(id, "");
 
         if (user is null)
         {
@@ -62,7 +62,7 @@ public class UserController: Controller {
     [HttpDelete("{id:length(24)}")]
     public async Task<IActionResult> Delete(string id)
     {
-        var user = await _userService.GetAsync(id);
+        var user = await _userService.GetAsync(id, "");
 
         if (user is null)
         {
