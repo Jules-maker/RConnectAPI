@@ -58,7 +58,7 @@ public class MeetingController : Controller
 
 
     [HttpPut("{id:length(24)}")]
-    public async Task<IActionResult> Update(string id, Meeting updatedMeeting)
+    public async Task<IActionResult> Update(string id, [FromBody] Meeting updatedMeeting)
     {
         var meeting = await _meetingService.GetAsync(id, "");
 

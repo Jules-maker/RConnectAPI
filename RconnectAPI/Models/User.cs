@@ -22,6 +22,7 @@ namespace RconnectAPI.Models
             Missedmeetings = missedmeetings;
         }
 
+
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; }
