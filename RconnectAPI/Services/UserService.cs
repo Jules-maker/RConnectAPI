@@ -1,4 +1,5 @@
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq.Expressions;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
@@ -18,7 +19,23 @@ public class UserService
     
     private readonly IConfiguration _configuration;
     
-    private readonly PasswordHasher<User> _passwordHasher = new PasswordHasher<User>();
+    private IFindFluent<User, User> GetFind(Expression<Func<User, bool>> filter, string fields = "")
+    {
+        Console.WriteLine(filter);
+        var find = _userCollection
+            .Find(filter);
+        if (fields is { Length: > 0 })
+        {
+            var fieldArray = fields.Split(',');
+            Console.WriteLine(fields);
+            ProjectionDefinition<User> projection = Builders<User>.Projection.Include("_id");
+            projection = fieldArray.Aggregate(projection, (current, field) => current.Include(field));
+            find = find
+                .Project<User>(projection);
+        }
+
+        return find;
+    }
     
     public UserService(IOptions<MongoDbSettings> mongoDBSettings, IConfiguration configuration) {
         MongoClient client = new MongoClient(mongoDBSettings.Value.ConnectionUri);
@@ -27,14 +44,14 @@ public class UserService
         _configuration = configuration;
     }
     
-    public async Task<List<User>> GetAsync(int limit = 10, int page = 1) =>
-        await _userCollection.Find(_ => true).Skip((page - 1) * limit).Limit(limit).ToListAsync();
+    public async Task<List<User>> GetAsync(string fields = "", int limit = 10, int page = 1) =>
+        await GetFind(_ => true, fields).Skip((page - 1) * limit).Limit(limit).ToListAsync();
     
     public async Task<long> GetCountAsync() =>
         await _userCollection.CountDocumentsAsync(_ => true);
 
-    public async Task<User?> GetAsync(string id) =>
-        await _userCollection.Find(x => x.Id == id).FirstOrDefaultAsync();
+    public async Task<User?> GetAsync(string id,string fields = "" ) =>
+        await GetFind(x => x.Id == id, fields).FirstOrDefaultAsync();
     public async Task<User?> GetByEmailAsync(string email) =>
         await _userCollection.Find(x => x.Email == email).FirstOrDefaultAsync();
 

@@ -15,16 +15,16 @@ public class HobbyController: Controller {
     }
 
     [HttpGet]
-    public async Task<ResponseData<Hobby>> Get(int limit = 10, int page = 1)
+    public async Task<ResponseData<Hobby>> Get(string fields = "", int limit = 10, int page = 1)
     {
-        var data = await _hobbyService.GetAsync(limit, page);
+        var data = await _hobbyService.GetAsync(fields, limit, page);
         var count = await _hobbyService.GetCountAsync();
         return new ResponseData<Hobby>(data, count);
     }
     [HttpGet("{id:length(24)}")]
-    public async Task<ActionResult<Hobby>> Get(string id)
+    public async Task<ActionResult<Hobby>> Get(string id, string fields = "")
     {
-        var hobby = await _hobbyService.GetAsync(id);
+        var hobby = await _hobbyService.GetAsync(id, fields);
 
         if (hobby is null)
         {
@@ -59,7 +59,7 @@ public class HobbyController: Controller {
     [HttpPut("{id:length(24)}")]
     public async Task<IActionResult> Update(string id, Hobby updatedHobby)
     {
-        var hobby = await _hobbyService.GetAsync(id);
+        var hobby = await _hobbyService.GetAsync(id, "");
 
         if (hobby is null)
         {
@@ -76,7 +76,7 @@ public class HobbyController: Controller {
     [HttpDelete("{id:length(24)}")]
     public async Task<IActionResult> Delete(string id)
     {
-        var hobby = await _hobbyService.GetAsync(id);
+        var hobby = await _hobbyService.GetAsync(id, "");
 
         if (hobby is null)
         {
