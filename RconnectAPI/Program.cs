@@ -1,9 +1,15 @@
 using RconnectAPI.Middleware;
 using RconnectAPI.Models;
 using RconnectAPI.Services;
+using DotNetEnv;
 
 var builder = WebApplication.CreateBuilder(args);
-
+// Charger le fichier .env s'il existe
+var envPath = Path.Combine(Directory.GetCurrentDirectory(), ".env");
+if (File.Exists(envPath))
+{
+    DotNetEnv.Env.Load(envPath);
+}
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

@@ -38,8 +38,9 @@ public class UserService
     }
     
     public UserService(IOptions<MongoDbSettings> mongoDBSettings, IConfiguration configuration) {
-        MongoClient client = new MongoClient(mongoDBSettings.Value.ConnectionUri);
-        IMongoDatabase database = client.GetDatabase(mongoDBSettings.Value.DatabaseName);
+
+        MongoClient client = new MongoClient(Environment.GetEnvironmentVariable("MONGODB_CONNECTION_URI"));
+        IMongoDatabase database = client.GetDatabase(Environment.GetEnvironmentVariable("MONGODB_DATABASE_NAME"));
         _userCollection = database.GetCollection<User>("users");
         _configuration = configuration;
     }
@@ -66,8 +67,8 @@ public class UserService
     
     
     private byte[] GetSigningKey()
-    { 
-        var base64Key = _configuration["Jwt:SecretKey"];
+    {
+        var base64Key = Environment.GetEnvironmentVariable("JWT_SECRET_KEY");
         return Convert.FromBase64String(base64Key);
     }
 
