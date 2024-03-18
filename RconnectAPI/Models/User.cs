@@ -32,6 +32,8 @@ namespace RconnectAPI.Models
         public string Firstname { get; set; }
         public string Lastname { get; set; }
         public DateTime Birthdate { get; set; }
+        public string? Token { get; set; }
+        public DateTime? TokenTime { get; set; }
         public List<string>? Hobbies { get; set; } = new List<string>();
         public List<string>? Contacts { get; set; } = new List<string>();
         public List<string>? Rating { get; set; } = new List<string>();

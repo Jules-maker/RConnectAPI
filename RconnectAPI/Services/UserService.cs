@@ -55,6 +55,8 @@ public class UserService
         await GetFind(x => x.Id == id, fields).FirstOrDefaultAsync();
     public async Task<User?> GetByEmailAsync(string email) =>
         await _userCollection.Find(x => x.Email == email).FirstOrDefaultAsync();
+    public async Task<User?> GetByTokenAsync(string token) =>
+        await _userCollection.Find(x => x.Token == token).FirstOrDefaultAsync();
 
     public async Task CreateAsync(User newUser) =>
         await _userCollection.InsertOneAsync(newUser);
@@ -114,6 +116,37 @@ public class UserService
         {
             // Gérer l'exception ou la journaliser
             throw new InvalidOperationException("Une erreur s'est produite lors de la génération du token JWT.", ex);
+        }
+    }
+    
+    public async Task<string[]> GenerateToken(string email)
+    {
+        try
+        {
+            var user = await GetByEmailAsync(email);
+            
+            string allowed = "ABCDEFGHIJKLMONOPQRSTUVWXYZabcdefghijklmonopqrstuvwxyz0123456789";
+            int strlen = 32;
+            char[] randomChars = new char[strlen];
+
+            for (int i = 0; i < strlen; i++)
+            {
+                randomChars[i] = allowed[RandomNumberGenerator.GetInt32(0, allowed.Length)];
+            }
+
+            string random = new string(randomChars);
+
+            user.Token = random;
+            var now = DateTime.Now;
+            user.TokenTime = new DateTime(now.Year, now.Month, now.Day, now.Hour + 2, now.Minute, now.Second);
+            Console.WriteLine(user.TokenTime);
+            await UpdateAsync(user.Id, user);
+            return [random, user.Username];
+        }
+        catch (Exception ex)
+        {
+            // Gérer l'exception ou la journaliser
+            throw new InvalidOperationException("Une erreur s'est produite lors de la génération du token.", ex);
         }
     }
 }

@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using RconnectAPI.Models;
 using RconnectAPI.Services;
@@ -40,5 +41,37 @@ public class AuthController: Controller {
             return BadRequest();
         }
         return Ok(user);
+    }
+    
+    // FORGOT PASSWORD
+    
+    [HttpGet("new_token/{email}")]
+    public async Task<IActionResult> NewToken(string email)
+    {
+        var data = await _userService.GenerateToken(email);
+
+        return Ok(data);
+    }
+    
+    [HttpGet("check_token/{token}")]
+    public async Task<IActionResult> CheckToken(string token)
+    {
+        var user = await _userService.GetByTokenAsync(token);
+        
+        if (user is null || user.TokenTime is null || user.Token is null)
+        {
+            return NotFound();
+        } 
+        if (DateTime.Compare((DateTime)user.TokenTime, DateTime.Now) < 0)
+        {
+            return BadRequest("Date expired");
+        }
+
+        user.TokenTime = null;
+        user.Token = null;
+
+        await _userService.UpdateAsync(user.Id, user);
+
+        return Ok("ok");
     }
 }
