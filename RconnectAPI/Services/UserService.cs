@@ -9,6 +9,7 @@ using Microsoft.IdentityModel.Tokens;
 using MongoDB.Driver;
 using RconnectAPI.Models;
 using BCrypt.Net;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 
 namespace RconnectAPI.Services;
@@ -138,9 +139,11 @@ public class UserService
 
             user.Token = random;
             var now = DateTime.Now;
+            // GENERE UN TOKEN VALIDE 2H
             user.TokenTime = new DateTime(now.Year, now.Month, now.Day, now.Hour + 2, now.Minute, now.Second);
             Console.WriteLine(user.TokenTime);
             await UpdateAsync(user.Id, user);
+            // return le token et l'username de l'utilisateur
             return [random, user.Username];
         }
         catch (Exception ex)
