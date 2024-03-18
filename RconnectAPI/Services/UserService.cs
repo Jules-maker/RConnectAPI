@@ -141,7 +141,6 @@ public class UserService
             var now = DateTime.Now;
             // GENERE UN TOKEN VALIDE 2H
             user.TokenTime = new DateTime(now.Year, now.Month, now.Day, now.Hour + 2, now.Minute, now.Second);
-            Console.WriteLine(user.TokenTime);
             await UpdateAsync(user.Id, user);
             // return le token et l'username de l'utilisateur
             return [random, user.Username];
