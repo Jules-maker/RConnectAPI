@@ -15,44 +15,60 @@ public class HobbyController: Controller {
     }
 
     [HttpGet]
-    public async Task<List<Hobby>> Get()
+    public async Task<ResponseData<Hobby>> Get(string fields = "", int limit = 10, int page = 1)
     {
-        return await _hobbyService.GetAsync();
+        var data = await _hobbyService.GetAsync(fields, limit, page);
+        var count = await _hobbyService.GetCountAsync();
+        return new ResponseData<Hobby>(data, count);
     }
     [HttpGet("{id:length(24)}")]
-    public async Task<ActionResult<Hobby>> Get(string id)
+    public async Task<ActionResult<Hobby>> Get(string id, string fields = "")
     {
-        var user = await _hobbyService.GetAsync(id);
+        var hobby = await _hobbyService.GetAsync(id, fields);
 
-        if (user is null)
+        if (hobby is null)
         {
             return NotFound();
         }
 
-        return user;
+        return hobby;
     }
 
     [HttpPost]
-    public async Task<IActionResult> Post(Hobby newBook)
+    public async Task<IActionResult> Post([FromBody] Hobby newHobby)
     {
-        await _hobbyService.CreateAsync(newBook);
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
 
-        return CreatedAtAction(nameof(Get), new { id = newBook.Id }, newBook);
+        try
+        {
+            await _hobbyService.CreateAsync(newHobby);
+
+            return CreatedAtAction(nameof(Get), newHobby);
+        }
+        catch
+        {
+            // Log the exception
+            return StatusCode(500, "An error occurred while creating the hobby.");
+        }
     }
 
-    [HttpPut("{id:length(24)}")]
-    public async Task<IActionResult> Update(string id, Hobby updatedBook)
-    {
-        var book = await _hobbyService.GetAsync(id);
 
-        if (book is null)
+    [HttpPut("{id:length(24)}")]
+    public async Task<IActionResult> Update(string id, [FromBody] Hobby updatedHobby)
+    {
+        var hobby = await _hobbyService.GetAsync(id, "");
+
+        if (hobby is null)
         {
             return NotFound();
         }
 
-        updatedBook.Id = book.Id;
+        updatedHobby.Id = hobby.Id;
 
-        await _hobbyService.UpdateAsync(id, updatedBook);
+        await _hobbyService.UpdateAsync(id, updatedHobby);
 
         return NoContent();
     }
@@ -60,9 +76,9 @@ public class HobbyController: Controller {
     [HttpDelete("{id:length(24)}")]
     public async Task<IActionResult> Delete(string id)
     {
-        var book = await _hobbyService.GetAsync(id);
+        var hobby = await _hobbyService.GetAsync(id, "");
 
-        if (book is null)
+        if (hobby is null)
         {
             return NotFound();
         }

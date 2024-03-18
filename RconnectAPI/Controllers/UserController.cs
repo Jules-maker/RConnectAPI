@@ -15,14 +15,16 @@ public class UserController: Controller {
     }
 
     [HttpGet]
-    public async Task<List<User>> Get()
+    public async Task<ResponseData<User>> Get(string fields = "", int limit = 10, int page = 1)
     {
-        return await _userService.GetAsync();
+        var data = await _userService.GetAsync(fields, limit, page);
+        var count = await _userService.GetCountAsync();
+        return new ResponseData<User>(data, count);
     }
     [HttpGet("{id:length(24)}")]
-    public async Task<ActionResult<User>> Get(string id)
+    public async Task<ActionResult<User>> Get(string id, string fields = "")
     {
-        var user = await _userService.GetAsync(id);
+        var user = await _userService.GetAsync(id, fields);
 
         if (user is null)
         {
@@ -33,26 +35,27 @@ public class UserController: Controller {
     }
 
     [HttpPost]
-    public async Task<IActionResult> Post(User newBook)
+    public async Task<IActionResult> Post([FromBody]  User newUser)
     {
-        await _userService.CreateAsync(newBook);
 
-        return CreatedAtAction(nameof(Get), new { id = newBook.Id }, newBook);
+        await _userService.CreateAsync(newUser);
+
+        return CreatedAtAction(nameof(Get), new { id = newUser.Id }, newUser);
     }
 
     [HttpPut("{id:length(24)}")]
-    public async Task<IActionResult> Update(string id, User updatedBook)
+    public async Task<IActionResult> Update(string id, [FromBody] User updatedUser)
     {
-        var book = await _userService.GetAsync(id);
+        var user = await _userService.GetAsync(id, "");
 
-        if (book is null)
+        if (user is null)
         {
             return NotFound();
         }
 
-        updatedBook.Id = book.Id;
+        updatedUser.Id = user.Id;
 
-        await _userService.UpdateAsync(id, updatedBook);
+        await _userService.UpdateAsync(id, updatedUser);
 
         return NoContent();
     }
@@ -60,9 +63,9 @@ public class UserController: Controller {
     [HttpDelete("{id:length(24)}")]
     public async Task<IActionResult> Delete(string id)
     {
-        var book = await _userService.GetAsync(id);
+        var user = await _userService.GetAsync(id, "");
 
-        if (book is null)
+        if (user is null)
         {
             return NotFound();
         }
@@ -71,5 +74,4 @@ public class UserController: Controller {
 
         return NoContent();
     }
-
 }
