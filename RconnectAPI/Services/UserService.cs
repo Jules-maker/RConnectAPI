@@ -111,6 +111,13 @@ public class UserService
     
     public async Task<User> RegisterAsync(string username, string email, string password, DateTime dob, string firstname, string lastname)
     {
+        var count = await GetCountAsync(u => u.Email == email || u.Username == username);
+
+        if (count > 0)
+        {
+            throw new Exception("User already exists");
+        }
+        
         var newUser = new User(username, BCrypt.Net.BCrypt.HashPassword(password), email, firstname, lastname, dob, new List<string>(), new List<string>(), new List<string>(), new List<string>());
 
         await CreateAsync(newUser);

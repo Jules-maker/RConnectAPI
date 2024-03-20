@@ -42,12 +42,27 @@ namespace RconnectAPI.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Inscription([FromBody] UserRegisterData newUser)
         {
-            var user = await _userService.RegisterAsync(newUser.Username, newUser.Email, newUser.Password, newUser.Birthdate, newUser.Firstname, newUser.Lastname);
-            if (user == null)
+            try
             {
-                return BadRequest();
+                var user = await _userService.RegisterAsync(newUser.Username, newUser.Email, newUser.Password,
+                    newUser.Birthdate, newUser.Firstname, newUser.Lastname);
+                if (user == null)
+                {
+                    return BadRequest();
+                }
+
+                return Ok(new ResponseData<User>(user));
             }
-            return Ok(new ResponseData<User>(user));
+            catch (Exception e)
+            {
+                if (e.Message == "User already exists"){
+                    return StatusCode(403, "User already exists");
+                }
+                else
+                {
+                    throw new Exception(e.Message);
+                }
+            }
         }
 
         [HttpGet("forgot_password/{email}")]
@@ -56,7 +71,7 @@ namespace RconnectAPI.Controllers
             var user = await _userService.GetUserByEmail(email);
             if (user == null)
             {
-                return NotFound("Utilisateur non trouv�.");
+                return StatusCode(404);
             }
 
             var token = GenerateResetToken();
@@ -151,7 +166,7 @@ namespace RconnectAPI.Controllers
 
             if (user == null || user.TokenTime == null || user.ResetToken == null)
             {
-                return NotFound("Lien invalide ou expiré.");
+                return StatusCode(401, "Lien invalide ou expiré");
             }
 
             if (DateTime.UtcNow > user.TokenTime.Value)
