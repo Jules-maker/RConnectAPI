@@ -92,6 +92,9 @@ public class UserService
         return result ? user : null;
     }
 
+
+
+
     public string GenerateJwt(User user)
     {
         try
@@ -119,13 +122,24 @@ public class UserService
             throw new InvalidOperationException("Une erreur s'est produite lors de la génération du token JWT.", ex);
         }
     }
-    
+
+    public async Task<User> GetUserByEmail(string email)
+    {
+        return await _userCollection.Find(u => u.Email == email).FirstOrDefaultAsync();
+    }
+
+
+    public async Task<User?> GetByResetTokenAsync(string token)
+    {
+        return await _userCollection.Find(u => u.ResetToken == token).FirstOrDefaultAsync();
+    }
+
     public async Task<string[]> GenerateToken(string email)
     {
         try
         {
             var user = await GetByEmailAsync(email);
-            
+
             string allowed = "ABCDEFGHIJKLMONOPQRSTUVWXYZabcdefghijklmonopqrstuvwxyz0123456789";
             int strlen = 32;
             char[] randomChars = new char[strlen];
@@ -143,7 +157,7 @@ public class UserService
             user.TokenTime = new DateTime(now.Year, now.Month, now.Day, now.Hour + 2, now.Minute, now.Second);
             await UpdateAsync(user.Id, user);
             // return le token et l'username de l'utilisateur
-            return [random, user.Username];
+            return new string[] { random, user.Username };
         }
         catch (Exception ex)
         {
@@ -151,4 +165,6 @@ public class UserService
             throw new InvalidOperationException("Une erreur s'est produite lors de la génération du token.", ex);
         }
     }
+
 }
+
