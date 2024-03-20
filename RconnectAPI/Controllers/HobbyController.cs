@@ -1,3 +1,4 @@
+using System.Net;
 using Microsoft.AspNetCore.Mvc;
 using RconnectAPI.Models;
 using RconnectAPI.Services;
@@ -15,11 +16,19 @@ public class HobbyController: Controller {
     }
 
     [HttpGet]
-    public async Task<ResponseData<Hobby>> Get(string fields = "", int limit = 10, int page = 1)
+    public async Task<IActionResult> Get(string fields = "", int limit = 10, int page = 1)
     {
-        var data = await _hobbyService.GetAsync(fields, limit, page);
-        var count = await _hobbyService.GetCountAsync();
-        return new ResponseData<Hobby>(data, count);
+        try
+        {
+            var data = await _hobbyService.GetAsync(fields, limit, page);
+            var count = await _hobbyService.GetCountAsync();
+            return Ok(new ListResponseData<Hobby>(data, count));
+        }
+        catch(Exception e)
+        {
+            throw new Exception(e.Message);
+        }
+        
     }
     [HttpGet("{id:length(24)}")]
     public async Task<ActionResult<Hobby>> Get(string id, string fields = "")
@@ -28,7 +37,7 @@ public class HobbyController: Controller {
 
         if (hobby is null)
         {
-            return NotFound();
+            return StatusCode(404);
         }
 
         return hobby;
@@ -45,13 +54,12 @@ public class HobbyController: Controller {
         try
         {
             await _hobbyService.CreateAsync(newHobby);
-
-            return CreatedAtAction(nameof(Get), newHobby);
+            var response = new ResponseData<Hobby>(newHobby);
+            return Ok(response);
         }
-        catch
+        catch (Exception e)
         {
-            // Log the exception
-            return StatusCode(500, "An error occurred while creating the hobby.");
+            throw new Exception(e.Message);
         }
     }
 
@@ -63,14 +71,14 @@ public class HobbyController: Controller {
 
         if (hobby is null)
         {
-            return NotFound();
+            return StatusCode(404);
         }
 
         updatedHobby.Id = hobby.Id;
 
         await _hobbyService.UpdateAsync(id, updatedHobby);
 
-        return NoContent();
+        return Ok(new ResponseData<Hobby>(updatedHobby));
     }
 
     [HttpDelete("{id:length(24)}")]
@@ -80,12 +88,12 @@ public class HobbyController: Controller {
 
         if (hobby is null)
         {
-            return NotFound();
+            return StatusCode(404);
         }
 
         await _hobbyService.RemoveAsync(id);
 
-        return NoContent();
+        return Ok(new ResponseData<string>(id + " deleted"));
     }
 
 }

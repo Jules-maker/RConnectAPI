@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using RconnectAPI.Models;
 using RconnectAPI.Services;
 using Host = RconnectAPI.Models.Host;
@@ -17,23 +18,24 @@ public class HostController : Controller
     }
 
     [HttpGet]
-    public async Task<ResponseData<Host>> Get(string fields = "", int limit = 10, int page = 1, string searchValue = "")
+    public async Task<IActionResult> Get(string fields = "", int limit = 10, int page = 1, string searchValue = "")
     {
         var data = await _hostService.GetAsync(fields, limit, page, searchValue);
         var count = await _hostService.GetCountAsync(searchValue);
-        return new ResponseData<Host>(data, count);
+        return Ok(new ListResponseData<Host>(data, count));
     }
     [HttpGet("{id:length(24)}")]
-    public async Task<ActionResult<Host>> Get(string id, string fields = "")
+    public async Task<IActionResult> Get(string id, string fields = "")
     {
         var host = await _hostService.GetAsync(id, fields);
 
         if (host is null)
         {
-            return NotFound();
+            return StatusCode(404);
         }
 
-        return host;
+        var response = new ResponseData<Host>(host);
+        return Ok(response);
     }
 
     [HttpPost]
@@ -48,12 +50,12 @@ public class HostController : Controller
         {
             await _hostService.CreateAsync(newHost);
 
-            return CreatedAtAction(nameof(Get), newHost);
+            var response = new ResponseData<Host>(newHost);
+            return Ok(response);
         }
-        catch
+        catch (Exception e)
         {
-            // Log the exception
-            return StatusCode(500, "An error occurred while creating the host.");
+            throw new Exception(e.Message);
         }
     }
 
@@ -65,14 +67,15 @@ public class HostController : Controller
 
         if (host is null)
         {
-            return NotFound();
+            return StatusCode(404);
         }
 
         updatedHost.Id = host.Id;
 
         await _hostService.UpdateAsync(id, updatedHost);
-
-        return NoContent();
+        
+        var response = new ResponseData<Host>(updatedHost);
+        return Ok(response);
     }
 
     [HttpDelete("{id:length(24)}")]
@@ -82,12 +85,13 @@ public class HostController : Controller
 
         if (host is null)
         {
-            return NotFound();
+            return StatusCode(404);
         }
 
         await _hostService.RemoveAsync(id);
 
-        return NoContent();
+        var response = new ResponseData<string>(id + " deleted");
+        return Ok(response);
     }
 
 }

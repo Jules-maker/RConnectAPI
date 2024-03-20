@@ -17,23 +17,23 @@ public class MeetingController : Controller
     }
 
     [HttpGet]
-    public async Task<ResponseData<Meeting>> Get(string fields = "", int limit = 10, int page = 1)
+    public async Task<IActionResult> Get(string fields = "", int limit = 10, int page = 1)
     {
         var data = await _meetingService.GetAsync(fields, limit, page);
         var count = await _meetingService.GetCountAsync();
-        return new ResponseData<Meeting>(data, count);
+        return Ok(new ListResponseData<Meeting>(data, count));
     }
     [HttpGet("{id:length(24)}")]
-    public async Task<ActionResult<Meeting>> Get(string id, string fields = "")
+    public async Task<IActionResult> Get(string id, string fields = "")
     {
         var meeting = await _meetingService.GetAsync(id, fields);
 
         if (meeting is null)
         {
-            return NotFound();
+            return StatusCode(404);
         }
 
-        return meeting;
+        return Ok(new ResponseData<Meeting>(meeting));
     }
 
     [HttpPost]
@@ -48,12 +48,11 @@ public class MeetingController : Controller
         {
             await _meetingService.CreateAsync(newMeeting);
 
-            return CreatedAtAction(nameof(Get), newMeeting);
+            return Ok(new ResponseData<Meeting>(newMeeting));
         }
-        catch
+        catch (Exception e)
         {
-            // Log the exception
-            return StatusCode(500, "An error occurred while creating the meeting.");
+            throw new Exception(e.Message);
         }
     }
     
@@ -63,12 +62,11 @@ public class MeetingController : Controller
         try
         {
             var data = await _meetingService.AddUser(id, bodyData.UserToAdd, bodyData.Notification);
-            return Ok(data);
+            return Ok(new ResponseData<string>(data));
         }
-        catch
+        catch (Exception e)
         {
-            // Log the exception
-            return StatusCode(500, "An error occurred while adding the user.");
+            throw new Exception(e.Message);
         }
     }
     [HttpPost("invite_user_to_meeting/{id:length(24)}")]
@@ -79,12 +77,11 @@ public class MeetingController : Controller
         try
         {
             var data = await _meetingService.InviteUser(id, userToInvite);
-            return Ok(data);
+            return Ok(new ResponseData<Meeting>(data));
         }
-        catch
+        catch (Exception e)
         {
-            // Log the exception
-            return StatusCode(500, "An error occurred while adding the user.");
+            throw new Exception(e.Message);
         }
     }
 
@@ -96,14 +93,13 @@ public class MeetingController : Controller
 
         if (meeting is null)
         {
-            return NotFound();
+            return StatusCode(404);
         }
 
         updatedMeeting.Id = meeting.Id;
 
         await _meetingService.UpdateAsync(id, updatedMeeting);
-
-        return NoContent();
+        return Ok(new ResponseData<Meeting>(updatedMeeting));
     }
 
     [HttpDelete("{id:length(24)}")]
@@ -113,12 +109,12 @@ public class MeetingController : Controller
 
         if (meeting is null)
         {
-            return NotFound();
+            return StatusCode(404);
         }
 
         await _meetingService.RemoveAsync(id);
 
-        return NoContent();
+        return Ok(new ResponseData<string>(id + " deleted"));
     }
 
 }

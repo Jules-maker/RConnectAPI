@@ -18,7 +18,7 @@ public class AuthController: Controller {
     // AUTH ----
     
     [HttpPost("login")]
-    public async Task<IActionResult> Connexion([FromBody]UserLoginData loginData)
+    public async Task<IActionResult> Login([FromBody]UserLoginData loginData)
     {
         var user = await _userService.Login(loginData.Email, loginData.Password);
         if (user == null)
@@ -29,18 +29,26 @@ public class AuthController: Controller {
         Console.WriteLine(user.Username);
 
         var token = _userService.GenerateJwt(user);
-        return Ok(new { token });   
+        var response = new ResponseData<string>( token );
+        return Ok(response);   
     }
     
     [HttpPost("register")]
     public async Task<IActionResult> Inscription([FromBody] UserRegisterData newUser)
     {
-        var user = await _userService.RegisterAsync(newUser.Username, newUser.Email, newUser.Password, newUser.Birthdate, newUser.Firstname, newUser.Lastname);
-        if (user == null)
+        try
         {
-            return BadRequest();
+            var user = await _userService.RegisterAsync(newUser.Username, newUser.Email, newUser.Password,
+                newUser.Birthdate, newUser.Firstname, newUser.Lastname);
+
+            var response = new ResponseData<User>(user);
+            return Ok(response);
         }
-        return Ok(user);
+        catch (Exception e)
+        {
+            throw new Exception(e.Message);
+        }
+        
     }
     
     // FORGOT PASSWORD
@@ -50,7 +58,9 @@ public class AuthController: Controller {
     {
         var data = await _userService.GenerateToken(email);
 
-        return Ok(data);
+        var response = new ResponseData<string>("Token created for " + email);
+        
+        return Ok(response);
     }
     
     [HttpGet("check_token/{token}")]
@@ -60,7 +70,7 @@ public class AuthController: Controller {
         
         if (user is null || user.TokenTime is null || user.Token is null)
         {
-            return NotFound();
+            return StatusCode(404);
         } 
         if (DateTime.Compare((DateTime)user.TokenTime, DateTime.Now) < 0)
         {
@@ -72,6 +82,8 @@ public class AuthController: Controller {
 
         await _userService.UpdateAsync(user.Id, user);
 
-        return Ok("ok");
+        var response = new ResponseData<string>(user.Id);
+        
+        return Ok(response);
     }
 }
