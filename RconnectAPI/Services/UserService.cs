@@ -83,23 +83,23 @@ public class UserService
 
     public async Task<User?> GetOneAsync(string id, string fields = "")
     {
-        var filterFunction = Builders<User>.Filter.Where(x => x.Id == id);
+        var filterFunction = Builders<User>.Filter.Where(u => u.Id == id);
         return await GetFind(filterFunction, fields).FirstOrDefaultAsync();
     }
         
     public async Task<User?> GetByEmailAsync(string email) =>
-        await _userCollection.Find(x => x.Email == email).FirstOrDefaultAsync();
+        await _userCollection.Find(u => u.Email == email).FirstOrDefaultAsync();
     public async Task<User?> GetByTokenAsync(string token) =>
-        await _userCollection.Find(x => x.Token == token).FirstOrDefaultAsync();
+        await _userCollection.Find(u => u.Token == token).FirstOrDefaultAsync();
 
     public async Task CreateAsync(User newUser) =>
         await _userCollection.InsertOneAsync(newUser);
 
     public async Task UpdateAsync(string id, User updatedUser) =>
-        await _userCollection.ReplaceOneAsync(x => x.Id == id, updatedUser);
+        await _userCollection.ReplaceOneAsync(u => u.Id == id, updatedUser);
 
     public async Task RemoveAsync(string id) =>
-        await _userCollection.DeleteOneAsync(x => x.Id == id);
+        await _userCollection.DeleteOneAsync(u => u.Id == id);
     
     
     private byte[] GetSigningKey()
