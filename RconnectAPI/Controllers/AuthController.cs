@@ -64,7 +64,7 @@ namespace RconnectAPI.Controllers
             user.ResetToken = token;
             user.TokenTime = DateTime.Now.AddHours(1);
             await _userService.UpdateAsync(user.Id, user);
-            var resetLink = $"https://localhost:7082/Auth/reset_password/{token}";
+            var resetLink = $"https://rconnect-api.azurewebsites.net/Auth/reset_password/{token}";
             SendResetPasswordEmail(email, resetLink);
 
             return Ok("Un e-mail de réinitialisation a été envoyé à votre adresse e-mail.");
