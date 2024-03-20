@@ -8,7 +8,7 @@ namespace RconnectAPI.Models
     [BsonIgnoreExtraElements]
     public class User
     {
-        public User(string username, string password, string email, string firstname, string lastname, DateTime birthdate, List<string>? hobbies = null, List<string>? contacts = null, List<string>? rating = null, List<string>? missedmeetings = null)
+        public User(string username, string password, string email, string firstname, string lastname, DateTime birthdate, List<string>? hobbies = null, List<string>? favouritehosts = null, List<string>? rating = null, List<string>? missedmeetings = null)
         {
             Username = username;
             Password = password;
@@ -17,7 +17,7 @@ namespace RconnectAPI.Models
             Lastname = lastname;
             Birthdate = birthdate;
             Hobbies = hobbies;
-            Contacts = contacts;
+            Favouritehosts = favouritehosts;
             Rating = rating;
             Missedmeetings = missedmeetings;
         }
@@ -35,7 +35,7 @@ namespace RconnectAPI.Models
         public string? Token { get; set; }
         public DateTime? TokenTime { get; set; }
         public List<string>? Hobbies { get; set; } = new List<string>();
-        public List<string>? Contacts { get; set; } = new List<string>();
+        public List<string>? Favouritehosts { get; set; } = new List<string>();
         public List<string>? Rating { get; set; } = new List<string>();
         public List<string>? Missedmeetings { get; set; } = new List<string>();
 
@@ -62,7 +62,7 @@ namespace RconnectAPI.Models
         public string Lastname { get; set; }
         public DateTime Birthdate { get; set; }
         public List<string>? Hobbies { get; set; } = new List<string>();
-        public List<string>? Contacts { get; set; } = new List<string>();
+        public List<string>? Favouritehosts { get; set; } = new List<string>();
         public List<string>? Rating { get; set; } = new List<string>();
         public List<string>? Missedmeetings { get; set; } = new List<string>();
 
