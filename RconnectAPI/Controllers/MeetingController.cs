@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using RconnectAPI.Models;
 using RconnectAPI.Services;
 
@@ -53,6 +54,37 @@ public class MeetingController : Controller
         {
             // Log the exception
             return StatusCode(500, "An error occurred while creating the meeting.");
+        }
+    }
+    
+    [HttpPost("add_user_to_meeting/{id:length(24)}")]
+    public async Task<IActionResult> AddPost(string id, [FromBody] AddUserData bodyData)
+    {
+        try
+        {
+            var data = await _meetingService.AddUser(id, bodyData.UserToAdd, bodyData.Notification);
+            return Ok(data);
+        }
+        catch
+        {
+            // Log the exception
+            return StatusCode(500, "An error occurred while adding the user.");
+        }
+    }
+    [HttpPost("invite_user_to_meeting/{id:length(24)}")]
+    public async Task<IActionResult> InvitePost(string id, [FromBody] string userToInvite)
+    {
+        Console.WriteLine(userToInvite);
+        Console.WriteLine(id);
+        try
+        {
+            var data = await _meetingService.InviteUser(id, userToInvite);
+            return Ok(data);
+        }
+        catch
+        {
+            // Log the exception
+            return StatusCode(500, "An error occurred while adding the user.");
         }
     }
 

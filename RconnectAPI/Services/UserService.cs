@@ -20,7 +20,7 @@ public class UserService
     
     private readonly IConfiguration _configuration;
     
-    private IFindFluent<User, User> GetFind(Expression<Func<User, bool>> filter, string fields = "")
+    private IFindFluent<User, User> GetFind(FilterDefinition<User> filter, string fields = "")
     {
         Console.WriteLine(filter);
         var find = _userCollection
@@ -45,28 +45,61 @@ public class UserService
         _userCollection = database.GetCollection<User>("users");
         _configuration = configuration;
     }
-    
-    public async Task<List<User>> GetAsync(string fields = "", int limit = 10, int page = 1) =>
-        await GetFind(_ => true, fields).Skip((page - 1) * limit).Limit(limit).ToListAsync();
-    
-    public async Task<long> GetCountAsync() =>
-        await _userCollection.CountDocumentsAsync(_ => true);
 
-    public async Task<User?> GetAsync(string id,string fields = "" ) =>
-        await GetFind(x => x.Id == id, fields).FirstOrDefaultAsync();
+    public async Task<List<User>> GetAsync(
+        Expression<Func<User, bool>>? filter = null, 
+        string fields = "",
+        int limit = 10, 
+        int page = 1
+    )
+    {
+        FilterDefinition<User> filterFunction;
+        if (filter != null)
+        {
+            filterFunction = Builders<User>.Filter.Where(filter);
+        }
+        else
+        {
+            filterFunction = Builders<User>.Filter.Where(_ => true);
+        }
+        return await GetFind(filterFunction, fields).Skip((page - 1) * limit).Limit(limit).ToListAsync();
+    }
+        
+    
+    public async Task<long> GetCountAsync(Expression<Func<User,bool>>? filter = null)
+    {
+        FilterDefinition<User> filterFunction;
+        if (filter != null)
+        {
+            filterFunction = Builders<User>.Filter.Where(filter);
+        }
+        else
+        {
+            filterFunction = Builders<User>.Filter.Where(_ => true);
+        }
+        
+        return await _userCollection.CountDocumentsAsync(filterFunction);
+    }
+
+    public async Task<User?> GetOneAsync(string id, string fields = "")
+    {
+        var filterFunction = Builders<User>.Filter.Where(u => u.Id == id);
+        return await GetFind(filterFunction, fields).FirstOrDefaultAsync();
+    }
+        
     public async Task<User?> GetByEmailAsync(string email) =>
-        await _userCollection.Find(x => x.Email == email).FirstOrDefaultAsync();
+        await _userCollection.Find(u => u.Email == email).FirstOrDefaultAsync();
     public async Task<User?> GetByTokenAsync(string token) =>
-        await _userCollection.Find(x => x.Token == token).FirstOrDefaultAsync();
+        await _userCollection.Find(u => u.Token == token).FirstOrDefaultAsync();
 
     public async Task CreateAsync(User newUser) =>
         await _userCollection.InsertOneAsync(newUser);
 
     public async Task UpdateAsync(string id, User updatedUser) =>
-        await _userCollection.ReplaceOneAsync(x => x.Id == id, updatedUser);
+        await _userCollection.ReplaceOneAsync(u => u.Id == id, updatedUser);
 
     public async Task RemoveAsync(string id) =>
-        await _userCollection.DeleteOneAsync(x => x.Id == id);
+        await _userCollection.DeleteOneAsync(u => u.Id == id);
     
     
     private byte[] GetSigningKey()
