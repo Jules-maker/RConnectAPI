@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using RconnectAPI.Models;
 using RconnectAPI.Services;
@@ -15,11 +16,11 @@ public class UserController: Controller {
     }
 
     [HttpGet]
-    public async Task<ResponseData<User>> Get(string fields = "", int limit = 10, int page = 1)
+    public async Task<ListResponseData<User>> Get(string fields = "", int limit = 10, int page = 1)
     {
         var data = await _userService.GetAsync(null, fields, limit, page);
         var count = await _userService.GetCountAsync();
-        return new ResponseData<User>(data, count);
+        return new ListResponseData<User>(data, count);
     }
     
     [HttpGet("restaurant/{id:length(24)}")]
@@ -30,26 +31,26 @@ public class UserController: Controller {
             var fields = "username";
             var users = await _userService.GetAsync(u => u.Favouritehosts != null && u.Favouritehosts.Contains(id), fields, limit, page);
             var count = await _userService.GetCountAsync(u => u.Favouritehosts != null && u.Favouritehosts.Contains(id));
-            var response = new ResponseData<User>(users, count);
+            var response = new ListResponseData<User>(users, count);
             return Ok(response);
         }
-        catch
+        catch (Exception e)
         {
-            throw new Exception("Echec de la récupération des données");
+            throw new Exception(e.Message);
         }
     }
     
     [HttpGet("{id:length(24)}")]
-    public async Task<ActionResult<User>> Get(string id, string fields = "")
+    public async Task<IActionResult> Get(string id, string fields = "")
     {
         var user = await _userService.GetOneAsync(id, fields);
 
         if (user is null)
         {
-            return NotFound();
+            return StatusCode(404);
         }
 
-        return user;
+        return Ok(new ResponseData<User>(user));
     }
 
     [HttpPost]
@@ -68,14 +69,14 @@ public class UserController: Controller {
 
         if (user is null)
         {
-            return NotFound();
+            return StatusCode(404);
         }
 
         updatedUser.Id = user.Id;
 
         await _userService.UpdateAsync(id, updatedUser);
 
-        return NoContent();
+        return Ok(new ResponseData<User>(updatedUser));
     }
 
     [HttpDelete("{id:length(24)}")]
@@ -85,11 +86,11 @@ public class UserController: Controller {
 
         if (user is null)
         {
-            return NotFound();
+            return StatusCode(404);
         }
 
         await _userService.RemoveAsync(id);
 
-        return NoContent();
+        return Ok(new ResponseData<string>(id + " deleted"));
     }
 }

@@ -14,7 +14,6 @@ namespace RconnectAPI.Controllers
     {
         private readonly UserService _userService;
         private const string CompanyName = "R-Konnect";
-
         private static string EmailSender;
         private static string Password;
 
@@ -37,7 +36,7 @@ namespace RconnectAPI.Controllers
             }
 
             var token = _userService.GenerateJwt(user);
-            return Ok(new { token });
+            return Ok(new ResponseData<string>(token));
         }
 
         [HttpPost("register")]
@@ -48,7 +47,7 @@ namespace RconnectAPI.Controllers
             {
                 return BadRequest();
             }
-            return Ok(user);
+            return Ok(new ResponseData<User>(user));
         }
 
         [HttpGet("forgot_password/{email}")]
@@ -57,7 +56,7 @@ namespace RconnectAPI.Controllers
             var user = await _userService.GetUserByEmail(email);
             if (user == null)
             {
-                return NotFound("Utilisateur non trouvé.");
+                return NotFound("Utilisateur non trouvï¿½.");
             }
 
             var token = GenerateResetToken();
@@ -67,7 +66,7 @@ namespace RconnectAPI.Controllers
             var resetLink = $"https://rconnect-api.azurewebsites.net/Auth/reset_password/{token}";
             SendResetPasswordEmail(email, resetLink);
 
-            return Ok("Un e-mail de réinitialisation a été envoyé à votre adresse e-mail.");
+            return Ok(new ResponseData<string>("Un lien de rÃ©initialisation a Ã©tÃ© envoyÃ© Ã  votre adresse e-mail."));
         }
 
         private string GenerateResetToken()
@@ -81,7 +80,7 @@ namespace RconnectAPI.Controllers
             {
                 message.From = new MailAddress(EmailSender, CompanyName);
                 message.To.Add(email);
-                message.Subject = "Réinitialisation de mot de passe";
+                message.Subject = "Rï¿½initialisation de mot de passe";
                 message.IsBodyHtml = true; 
 
                 // logo 
@@ -124,13 +123,13 @@ namespace RconnectAPI.Controllers
             </head>
             <body>
                 <div class='container'>
-                    <h2>Réinitialisation de mot de passe</h2>
+                    <h2>Rï¿½initialisation de mot de passe</h2>
                     <img class='logo' src='cid:logo' alt='Logo'>
-                    <p>Cliquez sur le lien suivant pour réinitialiser votre mot de passe :</p>
-                    <p><a class='button' href='{resetLink}'>Réinitialiser le mot de passe</a></p>
-                    <p>Si le bouton ci-dessus ne fonctionne pas, vous pouvez également copier et coller le lien suivant dans votre navigateur :</p>
+                    <p>Cliquez sur le lien suivant pour rï¿½initialiser votre mot de passe :</p>
+                    <p><a class='button' href='{resetLink}'>Rï¿½initialiser le mot de passe</a></p>
+                    <p>Si le bouton ci-dessus ne fonctionne pas, vous pouvez ï¿½galement copier et coller le lien suivant dans votre navigateur :</p>
                     <p>{resetLink}</p>
-                    <p>Merci,<br>L'équipe R-Konnect</p>
+                    <p>Merci,<br>L'ï¿½quipe R-Konnect</p>
 
                 </div>
             </body>
@@ -144,27 +143,6 @@ namespace RconnectAPI.Controllers
             }
         }
 
-     //   [HttpGet("check_token/{token}")]
-      //  public async Task<IActionResult> CheckToken(string token)
-     //   {
-     //       var user = await _userService.GetByResetTokenAsync(token);
-
-      //      if (user == null || user.TokenTime == null || user.ResetToken == null)
-       //     {
-       //         return NotFound("Lien invalide ou expiré.");
-      //      }
-
-       //     if (DateTime.UtcNow > user.TokenTime.Value)
-     //       {
-      //          return BadRequest("Lien expiré.");
-      //      }
-
-
-            // Le token est valide, retourner une réponse avec l'ID de l'utilisateur
-   //         return Ok(new { UserId = user.Id });
-   //     }
-
-
 
         [HttpPost("reset_password/{token}")]
         public async Task<IActionResult> ResetPassword(string token, [FromBody] ResetPasswordModel model)
@@ -173,20 +151,18 @@ namespace RconnectAPI.Controllers
 
             if (user == null || user.TokenTime == null || user.ResetToken == null)
             {
-                return NotFound("Lien invalide ou expiré.");
+                return NotFound("Lien invalide ou expirÃ©.");
             }
 
             if (DateTime.UtcNow > user.TokenTime.Value)
             {
-                return BadRequest("Lien expiré.");
+                return BadRequest("Lien expirÃ©.");
             }
 
             user.Password = BCrypt.Net.BCrypt.HashPassword(model.NewPassword);
             await _userService.UpdateAsync(user.Id, user);
 
-            return Ok("Mot de passe réinitialisé avec succès.");
+            return Ok(new ResponseData<string>("Mot de passe rÃ©initialisÃ© avec succÃ©s."));
         }
-
-
     }
 }

@@ -16,23 +16,23 @@ public class NotificationController : Controller
     }
 
     [HttpGet]
-    public async Task<ResponseData<Notification>> Get(string fields = "", int limit = 10, int page = 1)
+    public async Task<IActionResult> Get(string fields = "", int limit = 10, int page = 1)
     {
         var data = await _notificationService.GetAsync(fields, limit, page);
         var count = await _notificationService.GetCountAsync();
-        return new ResponseData<Notification>(data, count);
+        return Ok(new ListResponseData<Notification>(data, count));
     }
     [HttpGet("{id:length(24)}")]
-    public async Task<ActionResult<Notification>> Get(string id, string fields = "")
+    public async Task<IActionResult> Get(string id, string fields = "")
     {
         var notification = await _notificationService.GetAsync(id, fields);
 
         if (notification is null)
         {
-            return NotFound();
+            return StatusCode(404);
         }
 
-        return notification;
+        return Ok(new ResponseData<Notification>(notification));
     }
 
     [HttpPost]
@@ -47,12 +47,11 @@ public class NotificationController : Controller
         {
             await _notificationService.CreateAsync(newNotification);
 
-            return CreatedAtAction(nameof(Get), newNotification);
+            return Ok(new ResponseData<Notification>(newNotification));
         }
-        catch
+        catch (Exception e)
         {
-            // Log the exception
-            return StatusCode(500, "An error occurred while creating the notification.");
+            throw new Exception(e.Message);
         }
     }
 
@@ -64,14 +63,14 @@ public class NotificationController : Controller
 
         if (notification is null)
         {
-            return NotFound();
+            return StatusCode(404);
         }
 
         updatedNotification.Id = notification.Id;
 
         await _notificationService.UpdateAsync(id, updatedNotification);
 
-        return NoContent();
+        return Ok(new ResponseData<Notification>(updatedNotification));
     }
 
     [HttpDelete("{id:length(24)}")]
@@ -81,12 +80,12 @@ public class NotificationController : Controller
 
         if (notification is null)
         {
-            return NotFound();
+            return StatusCode(404);
         }
 
         await _notificationService.RemoveAsync(id);
 
-        return NoContent();
+        return Ok(new ResponseData<string>(id + " deleted"));
     }
 
 }

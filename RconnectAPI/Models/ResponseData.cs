@@ -1,23 +1,28 @@
 namespace RconnectAPI.Models;
 
-public class ResponseData<T>
+public class ListResponseData<T>
 {
-    public List<T> data;
-    public long? totalCount;
+    private List<T> data;
 
-    public ResponseData(List<T> data, long? totalCount)
+    public ListResponseData(List<T> data, long? totalCount = 1)
     {
-        this.data = data;
-        this.totalCount = totalCount;
+        this.Data = data;
+        this.TotalCount = totalCount;
     }
 
-    public long? TotalCount
-    {
-        get => totalCount;
-        set => totalCount = value;
-    }
+    public long? TotalCount { get; set; }
 
     public List<T> Data
+    {
+        get => data;
+        set => data = value ?? throw new ArgumentNullException(nameof(value));
+    }
+}
+public class ResponseData<T>(T data)
+{
+    public T data = data;
+
+    public T Data
     {
         get => data;
         set => data = value ?? throw new ArgumentNullException(nameof(value));
