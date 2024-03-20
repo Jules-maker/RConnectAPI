@@ -38,6 +38,9 @@ namespace RconnectAPI.Models
         public List<string>? Favouritehosts { get; set; } = new List<string>();
         public List<string>? Rating { get; set; } = new List<string>();
         public List<string>? Missedmeetings { get; set; } = new List<string>();
+        public string ResetToken { get; set; }
+        public string NewPassword { get; set; }
+
 
     }
     public class UserRegisterData
@@ -51,10 +54,7 @@ namespace RconnectAPI.Models
             Lastname = lastname;
             Birthdate = birthdate;
         }
-
-        [BsonId]
-        [BsonRepresentation(BsonType.ObjectId)]
-        public string Id { get; set; }
+        
         public string Username { get; set; }
         public string Password { get; set; }
         public string Email { get; set; }
