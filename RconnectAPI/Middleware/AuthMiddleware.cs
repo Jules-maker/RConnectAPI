@@ -30,7 +30,7 @@ public class AuthMiddleware
                 var decodedToken = tokenHandler.ReadJwtToken(authHeader);
                 string userId = decodedToken.Claims.First(claim => claim.Type == "nameid").Value;
 
-                var user = await _userService.GetAsync(userId, "_id");
+                var user = await _userService.GetOneAsync(userId, "_id");
 
                 if (user is null)
                 {

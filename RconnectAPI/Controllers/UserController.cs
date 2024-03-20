@@ -24,7 +24,7 @@ public class UserController: Controller {
     [HttpGet("{id:length(24)}")]
     public async Task<ActionResult<User>> Get(string id, string fields = "")
     {
-        var user = await _userService.GetAsync(id, fields);
+        var user = await _userService.GetOneAsync(id, fields);
 
         if (user is null)
         {
@@ -46,7 +46,7 @@ public class UserController: Controller {
     [HttpPut("{id:length(24)}")]
     public async Task<IActionResult> Update(string id, [FromBody] User updatedUser)
     {
-        var user = await _userService.GetAsync(id, "");
+        var user = await _userService.GetOneAsync(id, "");
 
         if (user is null)
         {
@@ -63,7 +63,7 @@ public class UserController: Controller {
     [HttpDelete("{id:length(24)}")]
     public async Task<IActionResult> Delete(string id)
     {
-        var user = await _userService.GetAsync(id, "");
+        var user = await _userService.GetOneAsync(id, "");
 
         if (user is null)
         {

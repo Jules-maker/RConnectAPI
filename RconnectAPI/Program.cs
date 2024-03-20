@@ -20,6 +20,7 @@ builder.Services.Configure<MongoDbSettings>(builder.Configuration.GetSection("Mo
 builder.Services.AddSingleton<UserService>();
 builder.Services.AddSingleton<HobbyService>();
 builder.Services.AddSingleton<HostService>();
+builder.Services.AddSingleton<NotificationService>();
 builder.Services.AddSingleton<MeetingService>();
 
 builder.Services.AddControllers();

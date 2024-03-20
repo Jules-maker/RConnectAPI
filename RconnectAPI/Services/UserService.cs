@@ -52,7 +52,7 @@ public class UserService
     public async Task<long> GetCountAsync() =>
         await _userCollection.CountDocumentsAsync(_ => true);
 
-    public async Task<User?> GetAsync(string id,string fields = "" ) =>
+    public async Task<User?> GetOneAsync(string id,string fields = "" ) =>
         await GetFind(x => x.Id == id, fields).FirstOrDefaultAsync();
     public async Task<User?> GetByEmailAsync(string email) =>
         await _userCollection.Find(x => x.Email == email).FirstOrDefaultAsync();
