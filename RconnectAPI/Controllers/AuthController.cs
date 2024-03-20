@@ -36,7 +36,7 @@ namespace RconnectAPI.Controllers
             }
 
             var token = _userService.GenerateJwt(user);
-            return Ok(new { token });
+            return Ok(new ResponseData<string>(token));
         }
 
         [HttpPost("register")]
@@ -47,7 +47,7 @@ namespace RconnectAPI.Controllers
             {
                 return BadRequest();
             }
-            return Ok(user);
+            return Ok(new ResponseData<User>(user));
         }
 
         [HttpGet("forgot_password/{email}")]
@@ -66,7 +66,7 @@ namespace RconnectAPI.Controllers
             var resetLink = $"https://rconnect-api.azurewebsites.net/Auth/reset_password/{token}";
             SendResetPasswordEmail(email, resetLink);
 
-            return Ok("Un e-mail de r�initialisation a �t� envoy� � votre adresse e-mail.");
+            return Ok(new ResponseData<string>("Un lien de réinitialisation a été envoyé à votre adresse e-mail."));
         }
 
         private string GenerateResetToken()
@@ -143,27 +143,6 @@ namespace RconnectAPI.Controllers
             }
         }
 
-     //   [HttpGet("check_token/{token}")]
-      //  public async Task<IActionResult> CheckToken(string token)
-     //   {
-     //       var user = await _userService.GetByResetTokenAsync(token);
-
-      //      if (user == null || user.TokenTime == null || user.ResetToken == null)
-       //     {
-       //         return NotFound("Lien invalide ou expir�.");
-      //      }
-
-       //     if (DateTime.UtcNow > user.TokenTime.Value)
-     //       {
-      //          return BadRequest("Lien expir�.");
-      //      }
-
-
-            // Le token est valide, retourner une r�ponse avec l'ID de l'utilisateur
-   //         return Ok(new { UserId = user.Id });
-   //     }
-
-
 
         [HttpPost("reset_password/{token}")]
         public async Task<IActionResult> ResetPassword(string token, [FromBody] ResetPasswordModel model)
@@ -172,18 +151,18 @@ namespace RconnectAPI.Controllers
 
             if (user == null || user.TokenTime == null || user.ResetToken == null)
             {
-                return NotFound("Lien invalide ou expir�.");
+                return NotFound("Lien invalide ou expiré.");
             }
 
             if (DateTime.UtcNow > user.TokenTime.Value)
             {
-                return BadRequest("Lien expir�.");
+                return BadRequest("Lien expiré.");
             }
 
             user.Password = BCrypt.Net.BCrypt.HashPassword(model.NewPassword);
             await _userService.UpdateAsync(user.Id, user);
 
-            return Ok("Mot de passe r�initialis� avec succ�s.");
+            return Ok(new ResponseData<string>("Mot de passe réinitialisé avec succés."));
         }
     }
 }
