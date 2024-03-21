@@ -5,10 +5,11 @@ namespace RconnectAPI.Models
 {
     public class Notification
     {
-        public Notification(string user, string message)
+        public Notification(string user, string message, string? meeting = null)
         {
             User = user;
             Message = message;
+            Meeting = meeting;
         }
 
         [BsonId]
@@ -20,7 +21,8 @@ namespace RconnectAPI.Models
         public bool Available { get; set; } = true;
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public DateTime? OpenedAt { get; set; } = null;
-        public string User { get; set; }
+        public string User { get; }
+        public string? Meeting { get; } = null;
     }
 }
 

@@ -87,6 +87,7 @@ public class MeetingService
                 else
                 {
                     newNotif.Response = true;
+                    newNotif.OpenedAt = DateTime.UtcNow;
                 }
                 await _notificationService.UpdateAsync(meetingNotification, newNotif);
             }
@@ -98,10 +99,11 @@ public class MeetingService
             {
                 var newNotif = await _notificationService.GetOneAsync(notification);
                 newNotif.Response = true;
+                newNotif.OpenedAt = DateTime.UtcNow;
                 await _notificationService.UpdateAsync(notification, newNotif);
             }
         }
-        var newNotifForCreator = new Notification(createdBy.Id, createdBy.Username + " a répondu a ton invitation !");
+        var newNotifForCreator = new Notification(createdBy.Id, createdBy.Username + " a répondu a ton invitation !", meetingId);
         await _notificationService.CreateAsync(newNotifForCreator);
         return meeting.Id;
     }
@@ -135,6 +137,26 @@ public class MeetingService
         return meeting;
     }
         
+    public async Task<Notification> RespondToInviteAsync(bool response, string notifId)
+    {
+        var notif = await _notificationService.GetOneAsync(notifId);
+        if (response)
+        {
+            if (notif.Meeting == null)
+            {
+                throw new Exception("No meeting, invalid notification");
+            }
+            await AddUser(notif.Meeting, notif.User, notifId);
+        }
+        else
+        {
+            notif.Response = response;
+            notif.OpenedAt = DateTime.UtcNow;
+            await _notificationService.UpdateAsync(notifId, notif);
+        }
+
+        return notif;
+    }
 
     public async Task UpdateAsync(string id, Meeting updatedMeeting) =>
         await _meetingCollection.ReplaceOneAsync(x => x.Id == id, updatedMeeting);
