@@ -38,7 +38,7 @@ public class NotificationService
         await GetFind(_ => true, fields).Skip((page - 1) * limit).Limit(limit).ToListAsync();
     
     public async Task<List<Notification>> GetForUserAsync(string userId, string fields = "", int limit = 10, int page = 1) =>
-        await GetFind(n => n.User == userId, fields).Skip((page - 1) * limit).Limit(limit).ToListAsync();
+        await GetFind(n => n.User == userId, fields).SortByDescending(n => n.CreatedAt).Skip((page - 1) * limit).Limit(limit).ToListAsync();
     
     public async Task<Notification> FindWithUserAndMeeting(List<string> notifsToSearch, string userId)
     {
