@@ -40,6 +40,13 @@ public class HostService
             .Limit(limit)
             .ToListAsync();
 
+    public async Task<List<Host>> GetFromListAsync(List<string> hostList, string? fields = "")
+    {
+        return await GetFind(h => hostList.Contains(h.Id!), fields)
+            .ToListAsync();
+    }
+        
+
     public async Task<long> GetCountAsync(string? searchValue = null)
     {
         if (searchValue != null)
