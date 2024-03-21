@@ -38,14 +38,14 @@ public class UserController: Controller {
         }
     }
     
-    [HttpGet("restaurant/{id:length(24)}")]
-    public async Task<ActionResult<User>> GetFromRestaurant(string id, int limit = 10, int page = 1)
+    [HttpGet("restaurant/{restoId:length(24)}")]
+    public async Task<ActionResult<User>> GetFromRestaurant(string restoId, int limit = 10, int page = 1)
     {
         try
         {
             var fields = "username";
-            var users = await _userService.GetAsync(u => u.Favouritehosts != null && u.Favouritehosts.Contains(id), fields, limit, page);
-            var count = await _userService.GetCountAsync(u => u.Favouritehosts != null && u.Favouritehosts.Contains(id));
+            var users = await _userService.GetAsync(u => u.Favouritehosts != null && u.Favouritehosts.Contains(restoId), fields, limit, page);
+            var count = await _userService.GetCountAsync(u => u.Favouritehosts != null && u.Favouritehosts.Contains(restoId));
             var response = new ListResponseData<User>(users, count);
             return Ok(response);
         }
