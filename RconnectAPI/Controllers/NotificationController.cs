@@ -9,10 +9,12 @@ namespace RconnectAPI.Controllers;
 public class NotificationController : Controller
 {
     private readonly NotificationService _notificationService;
+    private readonly MeetingService _meetingService;
 
-    public NotificationController(NotificationService notificationService)
+    public NotificationController(NotificationService notificationService, MeetingService meetingService)
     {
         _notificationService = notificationService;
+        _meetingService = meetingService;
     }
 
     [HttpGet]
@@ -23,9 +25,9 @@ public class NotificationController : Controller
         return Ok(new ListResponseData<Notification>(data, count));
     }
     [HttpGet("{id:length(24)}")]
-    public async Task<IActionResult> Get(string id, string fields = "")
+    public async Task<IActionResult> Get(string id)
     {
-        var notification = await _notificationService.GetAsync(id, fields);
+        var notification = await _notificationService.GetOneAsync(id);
 
         if (notification is null)
         {
@@ -59,33 +61,72 @@ public class NotificationController : Controller
     [HttpPut("{id:length(24)}")]
     public async Task<IActionResult> Update(string id, [FromBody] Notification updatedNotification)
     {
-        var notification = await _notificationService.GetAsync(id, "");
-
-        if (notification is null)
+        try
         {
-            return StatusCode(404);
+            var notification = await _notificationService.GetOneAsync(id);
+
+            if (notification is null)
+            {
+                return StatusCode(404);
+            }
+
+            updatedNotification.Id = notification.Id;
+
+            await _notificationService.UpdateAsync(id, updatedNotification);
+
+            return Ok(new ResponseData<Notification>(updatedNotification));
         }
-
-        updatedNotification.Id = notification.Id;
-
-        await _notificationService.UpdateAsync(id, updatedNotification);
-
-        return Ok(new ResponseData<Notification>(updatedNotification));
+        catch (Exception e)
+        {
+            throw new Exception(e.Message);
+        }
     }
 
     [HttpDelete("{id:length(24)}")]
     public async Task<IActionResult> Delete(string id)
     {
-        var notification = await _notificationService.GetAsync(id, "");
-
-        if (notification is null)
+        try
         {
-            return StatusCode(404);
+            await _notificationService.RemoveAsync(id);
+
+            return Ok(new ResponseData<string>(id + " deleted"));
+        }
+        catch (Exception e)
+        {
+            throw new Exception(e.Message);
+        }
+    }
+    
+    public class NotifResponse
+    {
+        public NotifResponse(bool response, string notifId)
+        {
+            Response = response;
+            NotifId = notifId;
         }
 
-        await _notificationService.RemoveAsync(id);
+        public bool Response { get; }
+        public string NotifId { get; }
+    }
+    
+    [HttpPost("respond")]
+    public async Task<IActionResult> Respond([FromBody] NotifResponse data)
+    {
+        try
+        {
+            var notification = await _meetingService.RespondToInviteAsync(data.Response, data.NotifId);
 
-        return Ok(new ResponseData<string>(id + " deleted"));
+            if (notification is null)
+            {
+                return StatusCode(404);
+            }
+            
+            return Ok(new ResponseData<Notification>(notification));
+        }
+        catch (Exception e)
+        {
+            throw new Exception(e.Message);
+        }
     }
 
 }

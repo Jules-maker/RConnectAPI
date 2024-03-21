@@ -1,5 +1,6 @@
 ﻿using System.Linq.Expressions;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using RconnectAPI.Models;
@@ -56,9 +57,6 @@ public class NotificationService
     
     public async Task<long> GetCountAsync() =>
         await _notificationCollection.CountDocumentsAsync(_ => true);
-
-    public async Task<Notification?> GetAsync(string id, string fields = "") =>
-        await GetFind(x => x.Id == id, fields).FirstOrDefaultAsync();
 
     public async Task<string> CreateAsync(Notification newNotification)
     {
