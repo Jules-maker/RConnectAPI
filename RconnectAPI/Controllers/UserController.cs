@@ -43,7 +43,7 @@ public class UserController: Controller {
     {
         try
         {
-            var fields = "username";
+            var fields = "Username";
             var users = await _userService.GetAsync(u => u.Favouritehosts != null && u.Favouritehosts.Contains(restoId), fields, limit, page);
             var count = await _userService.GetCountAsync(u => u.Favouritehosts != null && u.Favouritehosts.Contains(restoId));
             var response = new ListResponseData<User>(users, count);
