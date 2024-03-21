@@ -3,9 +3,14 @@ using MongoDB.Bson;
 
 namespace RconnectAPI.Models
 {
+    public class LatLng(double lat, double lng)
+    {
+        private double Lat { get; set; } = lat;
+        private double Lng { get; set; } = lng;
+    }
     public class Host
     {
-        public Host(string name, string description, string address, string city, string phone, string mainphoto, Boolean isverified, List<string>? openinghours = null)
+        public Host(string name, string description, string address, string city, string phone, string mainphoto, Boolean isverified, LatLng latLng, List<string>? openinghours = null)
 
         {
             Name = name;
@@ -16,6 +21,7 @@ namespace RconnectAPI.Models
             Mainphoto = mainphoto;
             Isverified = isverified;
             Openinghours = openinghours;
+            LatLng = latLng;
         }
 
         [BsonId]
@@ -29,6 +35,7 @@ namespace RconnectAPI.Models
         public string Mainphoto { get; set; }
         public Boolean Isverified { get; set; }
         public List<string> Openinghours { get; set; } = new List<string>();
+        public LatLng LatLng { get; set; }
         public DateTime Createdat { get; set; }
     }
 }
