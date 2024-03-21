@@ -5,8 +5,8 @@ namespace RconnectAPI.Models
 {
     public class LatLng(double lat, double lng)
     {
-        private double Lat { get; set; } = lat;
-        private double Lng { get; set; } = lng;
+        public double Lat { get; set; } = lat;
+        public . double Lng { get; set; } = lng;
     }
     public class Host
     {
