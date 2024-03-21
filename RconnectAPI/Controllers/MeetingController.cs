@@ -26,7 +26,7 @@ public class MeetingController : Controller
     [HttpGet("{id:length(24)}")]
     public async Task<IActionResult> Get(string id, string fields = "")
     {
-        var meeting = await _meetingService.GetAsync(id, fields);
+        var meeting = await _meetingService.GetOneAsync(id, fields);
 
         if (meeting is null)
         {
@@ -89,7 +89,7 @@ public class MeetingController : Controller
     [HttpPut("{id:length(24)}")]
     public async Task<IActionResult> Update(string id, [FromBody] Meeting updatedMeeting)
     {
-        var meeting = await _meetingService.GetAsync(id, "");
+        var meeting = await _meetingService.GetOneAsync(id, "");
 
         if (meeting is null)
         {
@@ -105,7 +105,7 @@ public class MeetingController : Controller
     [HttpDelete("{id:length(24)}")]
     public async Task<IActionResult> Delete(string id)
     {
-        var meeting = await _meetingService.GetAsync(id, "");
+        var meeting = await _meetingService.GetOneAsync(id, "");
 
         if (meeting is null)
         {

@@ -5,8 +5,8 @@ namespace RconnectAPI.Models
 {
     public class AddUserData
     {
-        public string UserToAdd { get; }
-        public string? Notification { get; }
+        public string UserToAdd { get; set; }
+        public string? Notification { get; set; }
 
         public AddUserData(string userToAdd, string? notification = null)
         {

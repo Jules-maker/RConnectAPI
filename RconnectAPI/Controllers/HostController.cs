@@ -27,7 +27,7 @@ public class HostController : Controller
     [HttpGet("{id:length(24)}")]
     public async Task<IActionResult> Get(string id, string fields = "")
     {
-        var host = await _hostService.GetAsync(id, fields);
+        var host = await _hostService.GetOneAsync(id, fields);
 
         if (host is null)
         {
@@ -63,7 +63,7 @@ public class HostController : Controller
     [HttpPut("{id:length(24)}")]
     public async Task<IActionResult> Update(string id, Host updatedHost)
     {
-        var host = await _hostService.GetAsync(id, "");
+        var host = await _hostService.GetOneAsync(id, "");
 
         if (host is null)
         {
@@ -81,7 +81,7 @@ public class HostController : Controller
     [HttpDelete("{id:length(24)}")]
     public async Task<IActionResult> Delete(string id)
     {
-        var host = await _hostService.GetAsync(id, "");
+        var host = await _hostService.GetOneAsync(id, "");
 
         if (host is null)
         {

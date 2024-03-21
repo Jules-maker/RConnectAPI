@@ -22,7 +22,9 @@ namespace RconnectAPI.Models
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public DateTime? OpenedAt { get; set; } = null;
         public string User { get; set; }
-        public string? Meeting { get; } = null;
+        public string? Meeting { get; set; } = null;
+        public Meeting? PopulatedMeeting { get; set; } = null;
+        public Host? PopulatedHost { get; set; } = null;
     }
 }
 

@@ -47,7 +47,7 @@ public class MeetingService
     public async Task<long> GetCountAsync() =>
         await _meetingCollection.CountDocumentsAsync(_ => true);
 
-    public async Task<Meeting?> GetAsync(string id, string fields = "") =>
+    public async Task<Meeting?> GetOneAsync(string id, string fields = "") =>
         await GetFind(x => x.Id == id, fields).FirstOrDefaultAsync();
 
     public async Task CreateAsync(Meeting newMeeting)

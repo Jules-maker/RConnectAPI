@@ -59,7 +59,7 @@ public class HostService
     }
 
 
-    public async Task<Host?> GetAsync(string id, string fields = "") =>
+    public async Task<Host?> GetOneAsync(string id, string fields = "") =>
         await GetFind(x => x.Id == id, fields).FirstOrDefaultAsync();
 
     public async Task CreateAsync(Host newHost) =>

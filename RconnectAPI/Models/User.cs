@@ -80,7 +80,7 @@ namespace RconnectAPI.Models
     }
     public class UserProfileData(List<Host> hosts, List<Hobby> hobbies)
     {
-        public List<Host> Hosts { get; } = hosts;
-        public List<Hobby> Hobbies { get; } = hobbies;
+        public List<Host> Hosts { get; set; } = hosts;
+        public List<Hobby> Hobbies { get; set; } = hobbies;
     }
 }

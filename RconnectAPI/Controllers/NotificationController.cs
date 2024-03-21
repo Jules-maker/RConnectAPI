@@ -10,11 +10,13 @@ public class NotificationController : Controller
 {
     private readonly NotificationService _notificationService;
     private readonly MeetingService _meetingService;
+    private readonly HostService _hostService;
 
-    public NotificationController(NotificationService notificationService, MeetingService meetingService)
+    public NotificationController(NotificationService notificationService, MeetingService meetingService, HostService hostService)
     {
         _notificationService = notificationService;
         _meetingService = meetingService;
+        _hostService = hostService;
     }
 
     [HttpGet]
@@ -44,14 +46,21 @@ public class NotificationController : Controller
         {
             var notifications = await _notificationService.GetForUserAsync(userId, "", limit, page);
             var count = await _notificationService.GetCountAsync(n => n.User == userId);
-
+            
+            foreach (var notification in notifications)
+            {
+                if (notification.Meeting != null)
+                {
+                    notification.PopulatedMeeting = await _meetingService.GetOneAsync(notification.Meeting);
+                    notification.PopulatedHost = await _hostService.GetOneAsync(notification.PopulatedMeeting!.Host);
+                }
+            }
             return Ok(new ListResponseData<Notification>(notifications, count));
         }
         catch (Exception e)
         {
             throw new Exception(e.Message);
         }
-        
     }
 
     [HttpPost]
