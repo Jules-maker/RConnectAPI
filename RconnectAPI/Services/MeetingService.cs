@@ -52,9 +52,10 @@ public class MeetingService
 
     public async Task CreateAsync(Meeting newMeeting)
     {
+        var CreatedByUser =  await _userService.GetOneAsync(newMeeting.CreatedBy, "Username");
         foreach (var newMeetingUser in newMeeting.Users)
         {
-            var newNotif = new Notification(newMeetingUser, "Vous êtes invité");
+            var newNotif = new Notification(newMeetingUser, "Vous êtes invité par " + CreatedByUser.Username, newMeeting.Id);
             var notifId = await _notificationService.CreateAsync(newNotif);
             newMeeting.Notifications.Add(notifId);
         }
@@ -129,8 +130,8 @@ public class MeetingService
                 throw new Exception("already invited");
             }
         }
-
-        var newNotif = new Notification(userId, "Vous êtes invité");
+        var CreatedByUser =  await _userService.GetOneAsync(meeting.CreatedBy, "Username");
+        var newNotif = new Notification(userId, "Vous êtes invité par " + CreatedByUser.Username, meeting.Id);
         var newNotifId = await _notificationService.CreateAsync(newNotif);
         meeting.Notifications.Add(newNotifId);
         await UpdateAsync(meetingId, meeting);

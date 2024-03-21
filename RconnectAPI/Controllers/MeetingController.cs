@@ -69,14 +69,14 @@ public class MeetingController : Controller
             throw new Exception(e.Message);
         }
     }
-    [HttpPost("invite_user_to_meeting/{id:length(24)}")]
-    public async Task<IActionResult> InvitePost(string id, [FromBody] string userToInvite)
+    [HttpPost("invite_user_to_meeting/{meetingId:length(24)}")]
+    public async Task<IActionResult> InvitePost(string meetingId, [FromBody] string userToInvite)
     {
         Console.WriteLine(userToInvite);
-        Console.WriteLine(id);
+        Console.WriteLine(meetingId);
         try
         {
-            var data = await _meetingService.InviteUser(id, userToInvite);
+            var data = await _meetingService.InviteUser(meetingId, userToInvite);
             return Ok(new ResponseData<Meeting>(data));
         }
         catch (Exception e)

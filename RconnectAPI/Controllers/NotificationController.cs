@@ -45,7 +45,7 @@ public class NotificationController : Controller
         try
         {
             var notifications = await _notificationService.GetForUserAsync(userId, "", limit, page);
-            var count = await _notificationService.GetCountAsync(n => n.User == userId);
+            var count = await _notificationService.GetCountAsync(n => n.User == userId & n.Available == true);
             
             foreach (var notification in notifications)
             {
