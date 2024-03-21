@@ -21,7 +21,7 @@ namespace RconnectAPI.Models
         public bool Available { get; set; } = true;
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public DateTime? OpenedAt { get; set; } = null;
-        public string User { get; }
+        public string User { get; set; }
         public string? Meeting { get; } = null;
     }
 }

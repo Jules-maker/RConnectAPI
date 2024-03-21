@@ -25,7 +25,7 @@ public class NotificationController : Controller
         return Ok(new ListResponseData<Notification>(data, count));
     }
     [HttpGet("{id:length(24)}")]
-    public async Task<IActionResult> Get(string id)
+    public async Task<IActionResult> GetOne(string id)
     {
         var notification = await _notificationService.GetOneAsync(id);
 
@@ -35,6 +35,23 @@ public class NotificationController : Controller
         }
 
         return Ok(new ResponseData<Notification>(notification));
+    }
+    
+    [HttpGet("user/{userId:length(24)}")]
+    public async Task<IActionResult> GetForUser(string userId, int limit = 10, int page = 1)
+    {
+        try
+        {
+            var notifications = await _notificationService.GetForUserAsync(userId, "", limit, page);
+            var count = await _notificationService.GetCountAsync(n => n.User == userId);
+
+            return Ok(new ListResponseData<Notification>(notifications, count));
+        }
+        catch (Exception e)
+        {
+            throw new Exception(e.Message);
+        }
+        
     }
 
     [HttpPost]

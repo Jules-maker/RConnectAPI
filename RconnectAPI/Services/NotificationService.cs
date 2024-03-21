@@ -37,6 +37,9 @@ public class NotificationService
     public async Task<List<Notification>> GetAsync(string fields = "", int limit = 10, int page = 1) =>
         await GetFind(_ => true, fields).Skip((page - 1) * limit).Limit(limit).ToListAsync();
     
+    public async Task<List<Notification>> GetForUserAsync(string userId, string fields = "", int limit = 10, int page = 1) =>
+        await GetFind(n => n.User == userId, fields).Skip((page - 1) * limit).Limit(limit).ToListAsync();
+    
     public async Task<Notification> FindWithUserAndMeeting(List<string> notifsToSearch, string userId)
     {
         var builder = Builders<Notification>.Filter;
@@ -55,8 +58,20 @@ public class NotificationService
     public async Task<Notification> GetOneAsync(string id) =>
         await _notificationCollection.Find(s=>s.Id == id).FirstOrDefaultAsync();
     
-    public async Task<long> GetCountAsync() =>
-        await _notificationCollection.CountDocumentsAsync(_ => true);
+    public async Task<long> GetCountAsync(Expression<Func<Notification,bool>>? filter = null)
+    {
+        FilterDefinition<Notification> filterFunction;
+        if (filter != null)
+        {
+            filterFunction = Builders<Notification>.Filter.Where(filter);
+        }
+        else
+        {
+            filterFunction = Builders<Notification>.Filter.Where(_ => true);
+        }
+        
+        return await _notificationCollection.CountDocumentsAsync(filterFunction);
+    }
 
     public async Task<string> CreateAsync(Notification newNotification)
     {
