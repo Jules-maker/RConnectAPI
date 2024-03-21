@@ -78,4 +78,9 @@ namespace RconnectAPI.Models
         public string Email { get; set; }
 
     }
+    public class UserProfileData(List<Host> hosts, List<Hobby> hobbies)
+    {
+        public List<Host> Hosts { get; } = hosts;
+        public List<Hobby> Hobbies { get; } = hobbies;
+    }
 }

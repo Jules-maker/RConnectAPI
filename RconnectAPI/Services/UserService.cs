@@ -10,6 +10,7 @@ using MongoDB.Driver;
 using RconnectAPI.Models;
 using BCrypt.Net;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Host = RconnectAPI.Models.Host;
 
 
 namespace RconnectAPI.Services;
@@ -19,6 +20,8 @@ public class UserService
     private readonly IMongoCollection<User> _userCollection;
     
     private readonly IConfiguration _configuration;
+    private readonly HostService _hostService;
+    private readonly HobbyService _hobbyService;
     
     private IFindFluent<User, User> GetFind(FilterDefinition<User> filter, string fields = "")
     {
@@ -38,12 +41,14 @@ public class UserService
         return find;
     }
     
-    public UserService(IOptions<MongoDbSettings> mongoDBSettings, IConfiguration configuration) {
+    public UserService(IOptions<MongoDbSettings> mongoDBSettings, IConfiguration configuration, HostService hostService, HobbyService hobbyService) {
 
         MongoClient client = new MongoClient(Environment.GetEnvironmentVariable("MONGODB_CONNECTION_URI"));
         IMongoDatabase database = client.GetDatabase(Environment.GetEnvironmentVariable("MONGODB_DATABASE_NAME"));
         _userCollection = database.GetCollection<User>("users");
         _configuration = configuration;
+        _hostService = hostService;
+        _hobbyService = hobbyService;
     }
 
     public async Task<List<User>> GetAsync(
@@ -130,6 +135,28 @@ public class UserService
         if (user == null) return null;
         var result = BCrypt.Net.BCrypt.Verify(providedPassword, user.Password);
         return result ? user : null;
+    }
+    public async Task<UserProfileData> GetProfileInfo(string userId)
+    {
+        var user = await GetOneAsync(userId);
+        if (user == null)
+        {
+            throw new Exception("User not found");
+        }
+
+        var hosts = new List<Host>();
+        var hobbies = new List<Hobby>();
+        if (user.Favouritehosts != null)
+        {
+            hosts = await _hostService.GetFromListAsync(user.Favouritehosts, "Name,Mainphoto,City");
+        }
+        if (user.Hobbies != null)
+        {
+            hobbies = await _hobbyService.GetFromListAsync(user.Hobbies, "Name");
+        }
+
+        var response = new UserProfileData(hosts, hobbies);
+        return response;
     }
 
 

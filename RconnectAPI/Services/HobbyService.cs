@@ -51,6 +51,12 @@ public class HobbyService
         return await GetFind(x => x.Id == id, fields)
             .FirstOrDefaultAsync();
     }
+    
+    public async Task<List<Hobby>> GetFromListAsync(List<string> hobbyList, string? fields = "")
+    {
+        return await GetFind(h => hobbyList.Contains(h.Id!), fields)
+            .ToListAsync();
+    }
 
     public async Task CreateAsync(Hobby newHobby) =>
         await _hobbyCollection.InsertOneAsync(newHobby);
