@@ -104,6 +104,8 @@ public class MeetingService
                 await _notificationService.UpdateAsync(notification, newNotif);
             }
         }
+
+        await UpdateAsync(meeting.Id!, meeting);
         var newNotifForCreator = new Notification(createdBy.Id, createdBy.Username + " a répondu a ton invitation !", meetingId);
         await _notificationService.CreateAsync(newNotifForCreator);
         return meeting.Id;
