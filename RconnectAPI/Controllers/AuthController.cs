@@ -38,6 +38,58 @@ namespace RconnectAPI.Controllers
             var token = _userService.GenerateJwt(user);
             return Ok(new ResponseData<string>(token));
         }
+        private void SendConfirmationEmail(string email)
+        {
+            using (var message = new MailMessage())
+            {
+                message.From = new MailAddress(EmailSender, CompanyName);
+                message.To.Add(email);
+                message.Subject = "Confirmation d'inscription";
+                message.IsBodyHtml = true;
+
+                // Contenu du message au format HTML avec style
+                message.Body = $@"
+            <html>
+            <head>
+                <style>
+                    /* Ajoutez ici vos styles CSS */
+                    body {{
+                        font-family: Arial, sans-serif;
+                        background-color: #f4f4f4;
+                        padding: 20px;
+                    }}
+                    .container {{
+                        max-width: 600px;
+                        margin: 0 auto;
+                        background-color: #fff;
+                        padding: 40px;
+                        border-radius: 8px;
+                        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                    }}
+                    .logo {{
+                        max-width: 80px; 
+                        margin-bottom: 20px;
+                    }}
+                </style>
+            </head>
+            <body>
+                <div class='container'>
+                    <h2>Confirmation d'inscription</h2>
+                    <p>Votre inscription sur {CompanyName} a été confirmée avec succès.</p>
+                    <p>Merci de votre confiance.</p>
+
+                </div>
+            </body>
+            </html>";
+
+                using (var smtpClient = new SmtpClient("smtp.gmail.com", 587))
+                {
+                    smtpClient.EnableSsl = true;
+                    smtpClient.Credentials = new NetworkCredential(EmailSender, Password);
+                    smtpClient.Send(message);
+                }
+            }
+        }
 
         [HttpPost("register")]
         public async Task<IActionResult> Inscription([FromBody] UserRegisterData newUser)
@@ -51,11 +103,15 @@ namespace RconnectAPI.Controllers
                     return BadRequest();
                 }
 
+                // Envoyer un e-mail de confirmation d'inscription
+                SendConfirmationEmail(newUser.Email);
+
                 return Ok(new ResponseData<User>(user));
             }
             catch (Exception e)
             {
-                if (e.Message == "User already exists"){
+                if (e.Message == "User already exists")
+                {
                     return StatusCode(403, "User already exists");
                 }
                 else
@@ -64,6 +120,7 @@ namespace RconnectAPI.Controllers
                 }
             }
         }
+
 
         [HttpGet("forgot_password/{email}")]
         public async Task<IActionResult> ForgotPassword(string email)
