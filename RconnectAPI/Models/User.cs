@@ -83,4 +83,9 @@ namespace RconnectAPI.Models
         public List<Host> Hosts { get; set; } = hosts;
         public List<Hobby> Hobbies { get; set; } = hobbies;
     }
+    public class LoginResponseData(string token, string userId)
+    {
+        public string Token { get; set; } = token;
+        public string UserId { get; set; } = userId;
+    }
 }

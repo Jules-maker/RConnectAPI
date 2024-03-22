@@ -36,7 +36,7 @@ namespace RconnectAPI.Controllers
             }
 
             var token = _userService.GenerateJwt(user);
-            return Ok(new ResponseData<string>(token));
+            return Ok(new ResponseData<LoginResponseData>(new LoginResponseData(token:token, userId:user.Id)));
         }
         private void SendConfirmationEmail(string email)
         {
