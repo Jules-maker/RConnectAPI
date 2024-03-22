@@ -148,11 +148,11 @@ public class UserService
         var hobbies = new List<Hobby>();
         if (user.Favouritehosts != null)
         {
-            hosts = await _hostService.GetFromListAsync(user.Favouritehosts, "Name,Mainphoto,City");
+            hosts = await _hostService.GetFromListAsync(user.Favouritehosts );
         }
         if (user.Hobbies != null)
         {
-            hobbies = await _hobbyService.GetFromListAsync(user.Hobbies, "Name");
+            hobbies = await _hobbyService.GetFromListAsync(user.Hobbies);
         }
 
         var response = new UserProfileData(hosts, hobbies);
