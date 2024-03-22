@@ -158,6 +158,26 @@ public class UserService
         var response = new UserProfileData(hosts, hobbies);
         return response;
     }
+    public async Task<User> AddHobby(string userId, string hobbyId)
+    {
+        var user = await GetOneAsync(userId);
+        if (user == null)
+        {
+            throw new Exception("User not found");
+        }
+
+        user.Hobbies ??= [];
+        if (user.Hobbies.Contains(hobbyId))
+        {
+            user.Hobbies.Remove(hobbyId);
+        }
+        else
+        {
+            user.Hobbies.Add(hobbyId);
+        }
+        await UpdateAsync(user.Id, user);
+        return user;
+    }
 
 
 

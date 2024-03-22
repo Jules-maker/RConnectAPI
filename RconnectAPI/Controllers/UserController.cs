@@ -43,10 +43,24 @@ public class UserController: Controller {
     {
         try
         {
-            var fields = "Username";
+            var fields = "";
             var users = await _userService.GetAsync(u => u.Favouritehosts != null && u.Favouritehosts.Contains(restoId), fields, limit, page);
             var count = await _userService.GetCountAsync(u => u.Favouritehosts != null && u.Favouritehosts.Contains(restoId));
             var response = new ListResponseData<User>(users, count);
+            return Ok(response);
+        }
+        catch (Exception e)
+        {
+            throw new Exception(e.Message);
+        }
+    }
+    
+    [HttpGet("add_hobby/{userId:length(24)}")]
+    public async Task<ActionResult<User>> AddHobby(string hobbyId, string userId)
+    {
+        try
+        {
+            var response = new ResponseData<User>(await _userService.AddHobby(userId, hobbyId));
             return Ok(response);
         }
         catch (Exception e)
